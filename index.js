@@ -12,31 +12,42 @@ let products = [];
 
 // ===== FEATURED PRODUCTS (Home Page) =====
 async function loadFeaturedProducts() {
+    console.log('?? loadFeaturedProducts() called');
     try {
+        console.log('?? Fetching from:', API_URL);
         const response = await fetch(API_URL);
+        console.log('?? Response status:', response.status);
         if (!response.ok) throw new Error('Failed to fetch products');
         
-        const products = await response.json();
-        const featured = products.slice(0, 3);
+        const productsData = await response.json();
+        console.log('? Products loaded:', productsData.length);
+        const featured = productsData.slice(0, 4); // Show 4 products to match skeleton
+        console.log('? Featured products:', featured.length);
         
         displayFeaturedProducts(featured);
     } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('? Error loading products:', error);
         displayError('featured-products');
     }
 }
 
 function displayFeaturedProducts(products) {
+    console.log('?? displayFeaturedProducts() called with', products.length, 'products');
     const container = document.getElementById('featured-products');
     
-    if (!container) return;
+    if (!container) {
+        console.error('? Container #featured-products not found!');
+        return;
+    }
+    
+    console.log('? Container found:', container);
     
     if (products.length === 0) {
         container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Inga produkter tillgängliga</p>';
         return;
     }
     
-    container.innerHTML = products.map(product => `
+    const html = products.map(product => `
         <div class="product-card">
             <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
@@ -53,6 +64,10 @@ function displayFeaturedProducts(products) {
             </div>
         </div>
     `).join('');
+    
+    console.log('?? HTML generated, length:', html.length);
+    container.innerHTML = html;
+    console.log('? Products displayed!');
 }
 
 // ===== ALL PRODUCTS (Products Page) =====

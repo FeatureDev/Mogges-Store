@@ -6,6 +6,14 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Disable caching for development
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
+
 // Serve static files from the project root
 app.use(express.static(__dirname));
 app.use('/picture', express.static(path.join(__dirname, 'picture')));
@@ -108,7 +116,7 @@ app.get('/', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`? Server is running on http://localhost:${PORT}`);
+    console.log(`? Server is running on http://localhost:3000`);
     console.log('?? Mogges Store - Fashion E-commerce');
     console.log('Press Ctrl+C to stop the server');
 });
