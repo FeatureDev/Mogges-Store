@@ -2,13 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Program",
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/Server.js",
       "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/Server.js",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "console": "integratedTerminal"
     }
-  ]
+  ],
+  "compounds": []
 }

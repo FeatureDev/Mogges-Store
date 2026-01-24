@@ -5,7 +5,7 @@
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js",
-    "dev": "npx live-server",
+    "dev": "start.ps1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["github-pages", "static-site"],
