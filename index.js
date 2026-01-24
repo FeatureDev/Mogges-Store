@@ -32,27 +32,24 @@ function displayFeaturedProducts(products) {
     if (!container) return;
     
     if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Inga produkter tillgangliga</p>';
+        container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Inga produkter tillgängliga</p>';
         return;
     }
     
     container.innerHTML = products.map(product => `
         <div class="product-card">
-            <div class="product-image">${getProductEmoji(product.category)}</div>
+            <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description || 'Ingen beskrivning tillganglig'}</p>
+                <p class="product-description">${product.description || 'Ingen beskrivning tillgänglig'}</p>
                 <div class="product-footer">
                     <span class="product-price">${product.price} kr</span>
-                    <span class="product-stock ${getStockClass(product.stock)}">
-                        ${getStockText(product.stock)}
-                    </span>
+                    <button class="add-to-cart" 
+                            onclick="addToCart(${product.id})" 
+                            ${product.stock === 0 ? 'disabled' : ''}>
+                        Lägg till
+                    </button>
                 </div>
-                <button class="add-to-cart-btn" 
-                        onclick="addToCart(${product.id})" 
-                        ${product.stock === 0 ? 'disabled' : ''}>
-                    Lagg i varukorg
-                </button>
             </div>
         </div>
     `).join('');
@@ -87,22 +84,19 @@ function displayProducts(products) {
     
     container.innerHTML = products.map(product => `
         <div class="product-card">
-            <div class="product-image">${getProductEmoji(product.category)}</div>
+            <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description || 'Ingen beskrivning tillganglig'}</p>
+                <p class="product-description">${product.description || 'Ingen beskrivning tillgänglig'}</p>
+                ${product.category ? `<div style="margin-top: 0.5rem;"><span style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; color: #64748b;">${product.category}</span></div>` : ''}
                 <div class="product-footer">
                     <span class="product-price">${product.price} kr</span>
-                    <span class="product-stock ${getStockClass(product.stock)}">
-                        ${getStockText(product.stock)}
-                    </span>
+                    <button class="add-to-cart" 
+                            onclick="addToCart(${product.id})" 
+                            ${product.stock === 0 ? 'disabled' : ''}>
+                        Lägg till
+                    </button>
                 </div>
-                ${product.category ? `<div style="margin-top: 0.5rem;"><span style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; color: #64748b;">${product.category}</span></div>` : ''}
-                <button class="add-to-cart-btn" 
-                        onclick="addToCart(${product.id})" 
-                        ${product.stock === 0 ? 'disabled' : ''}>
-                    Lagg i varukorg
-                </button>
             </div>
         </div>
     `).join('');
