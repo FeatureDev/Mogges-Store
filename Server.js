@@ -64,6 +64,23 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'index', 'index.html'));
 });
 
+// Routes for other pages
+app.get('/products.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'products.html'));
+});
+
+app.get('/about.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'about.html'));
+});
+
+app.get('/cart.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'cart.html'));
+});
+
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'index.html'));
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`? Server is running on http://localhost:3000`);
