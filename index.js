@@ -186,7 +186,7 @@ function displayCart() {
     
     container.innerHTML = cartItems.map(item => `
         <div class="cart-item">
-            <div class="cart-item-image">${getProductEmoji(item.category)}</div>
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
             <div class="cart-item-info">
                 <h3 class="cart-item-name">${item.name}</h3>
                 <p class="cart-item-price">${item.price} kr</p>

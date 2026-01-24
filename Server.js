@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // Serve static files from the project root
 app.use(express.static(__dirname));
+app.use('/picture', express.static(path.join(__dirname, 'picture')));
 app.use(express.json());
 
 // Mock product data - Fashion/Clothing items
