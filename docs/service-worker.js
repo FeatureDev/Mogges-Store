@@ -1,4 +1,4 @@
-// Service Worker - Clear cache and always fetch fresh
+﻿// Service Worker - Clear cache and always fetch fresh
 const CACHE_NAME = 'mogges-store-v1';
 
 self.addEventListener('install', (event) => {

@@ -1,4 +1,4 @@
-'use strict';
+Ôªø'use strict';
 
 console.log('Hello world');
 
@@ -43,7 +43,7 @@ function displayFeaturedProducts(products) {
     console.log('? Container found:', container);
     
     if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Inga produkter tillg‰ngliga</p>';
+        container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Inga produkter tillg√§ngliga</p>';
         return;
     }
     
@@ -52,13 +52,13 @@ function displayFeaturedProducts(products) {
             <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description || 'Ingen beskrivning tillg‰nglig'}</p>
+                <p class="product-description">${product.description || 'Ingen beskrivning tillg√§nglig'}</p>
                 <div class="product-footer">
                     <span class="product-price">${product.price} kr</span>
                     <button class="add-to-cart" 
                             onclick="addToCart(${product.id})" 
                             ${product.stock === 0 ? 'disabled' : ''}>
-                        L‰gg till
+                        L√§gg till
                     </button>
                 </div>
             </div>
@@ -102,14 +102,14 @@ function displayProducts(products) {
             <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description || 'Ingen beskrivning tillg‰nglig'}</p>
+                <p class="product-description">${product.description || 'Ingen beskrivning tillg√§nglig'}</p>
                 ${product.category ? `<div style="margin-top: 0.5rem;"><span style="background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; color: #64748b;">${product.category}</span></div>` : ''}
                 <div class="product-footer">
                     <span class="product-price">${product.price} kr</span>
                     <button class="add-to-cart" 
                             onclick="addToCart(${product.id})" 
                             ${product.stock === 0 ? 'disabled' : ''}>
-                        L‰gg till
+                        L√§gg till
                     </button>
                 </div>
             </div>
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let clickCount = 0;
         button.addEventListener('click', function() {
             clickCount++;
-            message.textContent = `Du har klickat ${clickCount} ${clickCount === 1 ? 'gÂng' : 'gÂnger'}!`;
+            message.textContent = `Du har klickat ${clickCount} ${clickCount === 1 ? 'g√•ng' : 'g√•nger'}!`;
             
             message.style.opacity = '0';
             setTimeout(() => {
@@ -417,5 +417,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    console.log('Sidan ‰r laddad och redo!');
+    console.log('Sidan √§r laddad och redo!');
 });
