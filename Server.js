@@ -46,6 +46,20 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS configuration for cross-origin requests (GitHub Pages -> Phone backend)
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins (or specify GitHub Pages URL)
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, 'docs')));
 
@@ -254,25 +268,13 @@ app.get('/admin.html', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`? Server is running on http://localhost:3000`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`? Server is running on http://0.0.0.0:${PORT}`);
+    console.log(`?? Access from network: http://<YOUR_PHONE_IP>:${PORT}`);
     console.log('?? Mogges Store - Fashion E-commerce');
     console.log('???  Using SQLite Database');
+    console.log('?? CORS enabled for cross-origin requests');
     console.log('Press Ctrl+C to stop the server');
-    
-    // Open browser automatically
-    const url = `http://localhost:${PORT}`;
-    
-    // Wait a moment for server to be fully ready
-    setTimeout(() => {
-        exec(`start ${url}`, (error) => {
-            if (error) {
-                console.log('??  Could not open browser automatically. Please open manually:', url);
-            } else {
-                console.log('?? Opening browser...');
-            }
-        });
-    }, 500);
 });
 
 // Graceful shutdown

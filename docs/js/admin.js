@@ -1,5 +1,8 @@
 console.log('????? Admin page loaded');
 
+// Use API_BASE_URL from config.js
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+
 let products = [];
 let editingProductId = null;
 
@@ -78,9 +81,9 @@ document.getElementById('product-category').addEventListener('change', (e) => {
 
 // Check authentication
 async function checkAuth() {
-    try {
-        const response = await fetch('/api/check-auth');
-        const data = await response.json();
+try {
+    const response = await fetch(`${API_URL}/api/check-auth`);
+    const data = await response.json();
         
         if (!data.authenticated || data.user.role !== 'admin') {
             window.location.href = '/login.html';
@@ -98,9 +101,9 @@ async function checkAuth() {
 
 // Load products
 async function loadProducts() {
-    try {
-        const response = await fetch('/api/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
+try {
+    const response = await fetch(`${API_URL}/api/products`);
+    if (!response.ok) throw new Error('Failed to fetch products');
         
         products = await response.json();
         displayProducts();
@@ -196,7 +199,7 @@ async function deleteProduct(id) {
     if (!confirm('Ar du saker pa att du vill ta bort denna produkt?')) return;
     
     try {
-        const response = await fetch(`/api/products/${id}`, {
+        const response = await fetch(`${API_URL}/api/products/${id}`, {
             method: 'DELETE'
         });
         
@@ -228,7 +231,7 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
     };
     
     try {
-        const url = editingProductId ? `/api/products/${editingProductId}` : '/api/products';
+        const url = editingProductId ? `${API_URL}/api/products/${editingProductId}` : `${API_URL}/api/products`;
         const method = editingProductId ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -274,8 +277,8 @@ document.getElementById('product-modal').addEventListener('click', (e) => {
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', async () => {
-    try {
-        const response = await fetch('/api/logout', { method: 'POST' });
+try {
+    const response = await fetch(`${API_URL}/api/logout`, { method: 'POST' });
         if (response.ok) {
             window.location.href = '/login.html';
         }

@@ -1,5 +1,8 @@
 console.log('?? Login page loaded');
 
+// Use API_BASE_URL from config.js
+const API_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+
 const loginForm = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -21,7 +24,7 @@ loginForm.addEventListener('submit', async (e) => {
     loginButton.textContent = 'Loggar in';
     
     try {
-        const response = await fetch('/api/login', {
+        const response = await fetch(`${API_URL}/api/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
