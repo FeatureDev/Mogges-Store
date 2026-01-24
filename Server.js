@@ -14,8 +14,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve static files from the project root
-app.use(express.static(__dirname));
+// Serve static files from docs directory
+app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/picture', express.static(path.join(__dirname, 'picture')));
 app.use(express.json());
 
@@ -111,7 +111,7 @@ app.get('/api/products/:id', (req, res) => {
 
 // Route for main page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
 });
 
 // Start server
