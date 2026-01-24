@@ -371,14 +371,8 @@ document.head.appendChild(style);
 // ===== INITIALIZE ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function() {
     // Detect which page we're on and load appropriate content
-    const featuredContainer = document.getElementById('featured-products');
     const allProductsContainer = document.getElementById('all-products');
     const cartContainer = document.getElementById('cart-items');
-    
-    // Home page - Featured products
-    if (featuredContainer) {
-        loadFeaturedProducts();
-    }
     
     // Products page - All products with filters
     if (allProductsContainer) {
