@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Utforska alla vara produkter - Mogges Store">
+    <meta name="theme-color" content="#6366f1">
+    <title>Produkter - Mogges Store</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="8" fill="#6366f1"/>
+                        <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                    </svg>
+                    <span class="logo-text">Mogges Store</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Hem</a></li>
+                    <li><a href="products.html" class="active">Produkter</a></li>
+                    <li><a href="about.html">Om Oss</a></li>
+                    <li><a href="cart.html" class="cart-link">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        <span class="cart-count">0</span>
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Alla Produkter</h1>
+                <p>Utforska vart kompletta sortiment</p>
+            </div>
+        </section>
+
+        <section class="products-section">
+            <div class="container">
+                <div class="filter-section">
+                    <select id="category-filter" class="filter-select">
+                        <option value="">Alla kategorier</option>
+                    </select>
+                    <input type="text" id="search-input" placeholder="Sok produkter..." class="search-input">
+                </div>
+                
+                <div id="all-products" class="product-grid">
+                    <div class="product-card skeleton">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                    <div class="product-card skeleton">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                    <div class="product-card skeleton">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                    <div class="product-card skeleton">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Mogges Store</h3>
+                    <p>Din palitliga partner for kvalitetsprodukter</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Snabblankar</h4>
+                    <ul>
+                        <li><a href="index.html">Hem</a></li>
+                        <li><a href="products.html">Produkter</a></li>
+                        <li><a href="about.html">Om Oss</a></li>
+                        <li><a href="cart.html">Varukorg</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontakt</h4>
+                    <p>Email: info@moggesstore.se</p>
+                    <p>Tel: +46 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mogges Store. Alla rattigheter forbehallna.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="pwa-install.js"></script>
+    <script src="../index.js"></script>
+</body>
+</html>
+
