@@ -3,6 +3,79 @@ console.log('????? Admin page loaded');
 let products = [];
 let editingProductId = null;
 
+// Predefined product names per category (professional Swedish names)
+const productNamesByCategory = {
+    'Dam Mode': [
+        'Elegant Aftonklänning',
+        'Klassisk Blus',
+        'Modern Kavaj',
+        'Sommarklänning',
+        'Vinterkappa',
+        'Businesskjol',
+        'Stickad Tröja',
+        'Bomullsskjorta',
+        'Festklänning',
+        'Lång Cardigan'
+    ],
+    'Herr Mode': [
+        'Kostymbyxa',
+        'Businessskjorta',
+        'Kavaj',
+        'Polotröja',
+        'Stickad Tröja',
+        'Chinos',
+        'Jeans',
+        'Vinterjacka',
+        'Hoodie',
+        'Skjorta Premium'
+    ],
+    'Accessoarer': [
+        'Läderväska',
+        'Plånbok',
+        'Bälte',
+        'Halsduk',
+        'Mössa',
+        'Handskar',
+        'Solglasögon',
+        'Armband',
+        'Halsband',
+        'Örhängen'
+    ],
+    'Skor': [
+        'Läderskor',
+        'Sneakers',
+        'Stövlar',
+        'Sandaletter',
+        'Loafers',
+        'Pumps',
+        'Boots',
+        'Träningsskor',
+        'Vardagsskor',
+        'Festskor'
+    ]
+};
+
+// Update product name dropdown based on selected category
+function updateProductNameOptions(selectedCategory) {
+    const productNameSelect = document.getElementById('product-name');
+    const names = productNamesByCategory[selectedCategory] || [];
+    
+    if (!selectedCategory) {
+        productNameSelect.innerHTML = '<option value="">Valj kategori forst...</option>';
+        productNameSelect.disabled = true;
+        return;
+    }
+    
+    productNameSelect.disabled = false;
+    productNameSelect.innerHTML = '<option value="">Valj produktnamn...</option>' +
+        names.map(name => `<option value="${name}">${name}</option>`).join('');
+}
+
+// Category change listener
+document.getElementById('product-category').addEventListener('change', (e) => {
+    updateProductNameOptions(e.target.value);
+});
+
 // Check authentication
 async function checkAuth() {
     try {
@@ -73,6 +146,12 @@ document.getElementById('add-product-btn').addEventListener('click', () => {
     editingProductId = null;
     document.getElementById('modal-title').textContent = 'Lagg till produkt';
     document.getElementById('product-form').reset();
+    
+    // Reset category dropdown and name dropdown
+    document.getElementById('product-category').value = '';
+    document.getElementById('product-name').innerHTML = '<option value="">Valj kategori forst...</option>';
+    document.getElementById('product-name').disabled = true;
+    
     document.getElementById('product-modal').classList.add('show');
 });
 
@@ -84,11 +163,29 @@ function editProduct(id) {
     editingProductId = id;
     document.getElementById('modal-title').textContent = 'Redigera produkt';
     document.getElementById('product-id').value = product.id;
-    document.getElementById('product-name').value = product.name;
+    
+    // Set category first to populate name options
+    document.getElementById('product-category').value = product.category || 'Dam Mode';
+    updateProductNameOptions(product.category || 'Dam Mode');
+    
+    // Set name (either from predefined list or custom)
+    const productNameSelect = document.getElementById('product-name');
+    const nameExists = Array.from(productNameSelect.options).some(opt => opt.value === product.name);
+    
+    if (nameExists) {
+        productNameSelect.value = product.name;
+    } else {
+        // Add custom name as option if not in predefined list
+        const customOption = document.createElement('option');
+        customOption.value = product.name;
+        customOption.textContent = product.name + ' (anpassat)';
+        productNameSelect.appendChild(customOption);
+        productNameSelect.value = product.name;
+    }
+    
     document.getElementById('product-description').value = product.description || '';
     document.getElementById('product-price').value = product.price;
     document.getElementById('product-stock').value = product.stock;
-    document.getElementById('product-category').value = product.category || 'Dam Mode';
     document.getElementById('product-image').value = product.image;
     
     document.getElementById('product-modal').classList.add('show');
