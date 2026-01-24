@@ -81,6 +81,10 @@ app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'index', 'index.html'));
 });
 
+app.get('/checkout.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'checkout.html'));
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`? Server is running on http://localhost:3000`);
