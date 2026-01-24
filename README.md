@@ -2,76 +2,156 @@
 
 En fullständig e-commerce webbshop med Node.js backend och statisk frontend.
 
-## ?? Kör Backend på Telefon + Frontend på GitHub Pages
+## ?? Deploy med Ngrok (Fungerar från vilket WiFi som helst!)
 
-### **Backend (Telefon - Termux)**
+### **Backend (Telefon/Dator med Ngrok)**
 
-1. **Installera Termux** på din Android-telefon
-2. **Installera Node.js:**
-   ```bash
-   pkg update
-   pkg install nodejs git
-   ```
+#### **1. Installera Node.js och projektet**
 
-3. **Klona repot:**
-   ```bash
-   git clone https://github.com/FeatureDev/Node_Android_project
-   cd Node_Android_project
-   ```
+**På Telefon (Termux):**
+```bash
+pkg update
+pkg install nodejs git
+git clone https://github.com/FeatureDev/Node_Android_project
+cd Node_Android_project
+npm install
+npm run init-db
+```
 
-4. **Installera dependencies:**
-   ```bash
-   npm install
-   ```
+**På Dator:**
+```bash
+git clone https://github.com/FeatureDev/Node_Android_project
+cd Node_Android_project
+npm install
+npm run init-db
+```
 
-5. **Initiera databas:**
-   ```bash
-   npm run init-db
-   ```
+#### **2. Installera Ngrok**
 
-6. **Hitta din telefons IP-adress:**
-   - Gå till: Settings ? WiFi ? Din WiFi ? IP Address
-   - Exempel: `192.168.1.100`
+**På Telefon (Termux):**
+```bash
+# Download ngrok for Android ARM
+pkg install wget
+wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
+tar -xvzf ngrok-v3-stable-linux-arm64.tgz
+mv ngrok /data/data/com.termux/files/usr/bin/
+chmod +x /data/data/com.termux/files/usr/bin/ngrok
+```
 
-7. **Starta servern:**
-   ```bash
-   npm start
-   ```
-   
-   Servern körs nu på: `http://192.168.1.100:3000`
+**På Dator (Windows):**
+1. Gå till: https://ngrok.com/download
+2. Ladda ner för Windows
+3. Extrahera och lägg i PATH eller kör från mappen
+
+#### **3. Skapa gratis Ngrok-konto**
+
+1. Gå till: https://dashboard.ngrok.com/signup
+2. Skapa konto (gratis)
+3. Kopiera din **authtoken** från dashboard
+
+#### **4. Konfigurera Ngrok**
+
+```bash
+ngrok config add-authtoken <DIN_AUTHTOKEN>
+```
+
+#### **5. Starta Backend**
+
+```bash
+npm start
+```
+
+Backend körs nu på port 3000.
+
+#### **6. Öppna Ngrok Tunnel (ny terminal/tab)**
+
+**På Telefon:** Svajpa från vänster i Termux ? New session
+
+**På Dator:** Öppna ny terminal/PowerShell
+
+```bash
+ngrok http 3000
+```
+
+**Ngrok visar din publika URL:**
+```
+Forwarding: https://abc123.ngrok-free.app -> http://localhost:3000
+```
+
+**Kopiera HTTPS-URL:en!** (t.ex. `https://abc123.ngrok-free.app`)
+
+---
 
 ### **Frontend (GitHub Pages)**
 
-1. **Aktivera GitHub Pages:**
-   - Gå till GitHub repo ? Settings ? Pages
-   - Source: Deploy from a branch
-   - Branch: `main` ? `/docs` folder
-   - Save
+#### **1. Aktivera GitHub Pages**
 
-2. **Uppdatera API URL:**
-   - Öppna `docs/js/config.js`
-   - Ändra `PHONE_API` till din telefons IP:
-   ```javascript
-   PHONE_API: 'http://192.168.1.100:3000', // DIN IP HÄR!
-   ```
-   - Sätt `USE_PHONE: true`
+- Gå till GitHub repo ? **Settings** ? **Pages**
+- Source: `main` branch, `/docs` folder
+- Click **Save**
+
+#### **2. Uppdatera config.js med ngrok URL**
+
+**På din dator:**
+
+1. **Öppna:** `docs/js/config.js`
+
+2. **Ändra:**
+```javascript
+NGROK_API: 'https://ABC123.ngrok-free.app', // DIN NGROK URL!
+MODE: 'ngrok'  // Byt från 'local' till 'ngrok'
+```
 
 3. **Commit och push:**
-   ```bash
-   git add docs/js/config.js
-   git commit -m "Update API URL to phone backend"
-   git push
-   ```
+```bash
+git add docs/js/config.js
+git commit -m "Update ngrok URL"
+git push
+```
 
-4. **Vänta 1-2 minuter** tills GitHub Pages deployas
+#### **3. Vänta 1-2 minuter**
 
-5. **Öppna din site:**
-   - URL: `https://featuredev.github.io/Node_Android_project/index/index.html`
+GitHub Pages deployas automatiskt.
 
-### **Viktigt!**
-- Både telefon och dator måste vara på **samma WiFi-nätverk**
-- Backend (telefon) måste vara **igång** när du använder frontend
-- CORS är aktiverat för att tillåta requests från GitHub Pages
+#### **4. Öppna din webbshop!**
+
+```
+https://featuredev.github.io/Node_Android_project/index/index.html
+```
+
+**Nu fungerar det från VILKET WiFi SOM HELST! ??**
+
+---
+
+## **?? Viktigt om Ngrok (Gratis Tier)**
+
+- **URL ändras** varje gång du startar om ngrok
+- **Session timeout** efter ~8 timmar inaktivitet
+- **40 requests/minut** limit på gratis tier
+- **Statisk URL** kräver betald plan ($8/månad)
+
+**Varje gång ngrok URL ändras:**
+1. Kopiera ny URL från ngrok terminal
+2. Uppdatera `docs/js/config.js`
+3. Commit & push
+4. Vänta 1-2 min ? GitHub Pages uppdateras
+
+---
+
+## **?? Snabb Omstart-Guide**
+
+**När ngrok URL har ändrats:**
+
+```bash
+# 1. Kolla ny ngrok URL (i ngrok terminal)
+# 2. Uppdatera config.js
+sed -i 's|https://.*\.ngrok-free\.app|https://NEW-URL.ngrok-free.app|' docs/js/config.js
+
+# 3. Push
+git add docs/js/config.js
+git commit -m "Update ngrok URL"
+git push
+```
 
 ---
 

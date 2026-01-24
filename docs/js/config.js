@@ -1,21 +1,37 @@
 // API Configuration
-// Change this to your phone's IP address when running backend on phone
+// Change this to your ngrok URL when exposing backend to internet
 const CONFIG = {
     // Local development (when running npm start on PC)
     LOCAL_API: 'http://localhost:3000',
     
-    // Phone backend (replace with your phone's IP address)
-    // Find IP: Settings -> WiFi -> Your Network -> IP Address
-    PHONE_API: 'http://192.168.1.100:3000', // CHANGE THIS!
+    // Phone backend on same WiFi (replace with your phone's IP address)
+    PHONE_API: 'http://192.168.1.100:3000',
     
-    // Set to true when using phone backend
-    USE_PHONE: false
+    // Ngrok tunnel (replace with your ngrok URL)
+    // Example: https://abc123.ngrok-free.app
+    NGROK_API: 'https://YOUR-NGROK-URL.ngrok-free.app', // CHANGE THIS!
+    
+    // Choose mode: 'local', 'phone', or 'ngrok'
+    MODE: 'local'
 };
 
-// Export the active API URL
-const API_BASE_URL = CONFIG.USE_PHONE ? CONFIG.PHONE_API : CONFIG.LOCAL_API;
+// Get the active API URL based on mode
+function getApiUrl() {
+    switch(CONFIG.MODE) {
+        case 'phone':
+            return CONFIG.PHONE_API;
+        case 'ngrok':
+            return CONFIG.NGROK_API;
+        case 'local':
+        default:
+            return CONFIG.LOCAL_API;
+    }
+}
+
+const API_BASE_URL = getApiUrl();
 
 console.log('?? API Configuration:', {
-    mode: CONFIG.USE_PHONE ? 'PHONE BACKEND' : 'LOCAL BACKEND',
+    mode: CONFIG.MODE.toUpperCase(),
     url: API_BASE_URL
 });
+

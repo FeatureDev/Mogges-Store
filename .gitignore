@@ -25,6 +25,8 @@ Thumbs.db
 
 # Database
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 
 # Logs
@@ -37,3 +39,9 @@ logs/
 
 # Package lock (optional - remove this line if you want to commit it)
 package-lock.json
+
+# Ngrok
+ngrok
+ngrok.exe
+ngrok.yml
+
