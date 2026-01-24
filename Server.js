@@ -122,4 +122,19 @@ app.listen(PORT, () => {
     console.log(`? Server is running on http://localhost:3000`);
     console.log('?? Mogges Store - Fashion E-commerce');
     console.log('Press Ctrl+C to stop the server');
+    
+    // Open browser automatically
+    const { exec } = require('child_process');
+    const url = `http://localhost:${PORT}`;
+    
+    // Wait a moment for server to be fully ready
+    setTimeout(() => {
+        exec(`start ${url}`, (error) => {
+            if (error) {
+                console.log('??  Could not open browser automatically. Please open manually:', url);
+            } else {
+                console.log('?? Opening browser...');
+            }
+        });
+    }, 500);
 });
