@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
 
 const db = new sqlite3.Database('moggesstore.db', (err) => {
     if (err) {
@@ -8,11 +9,13 @@ const db = new sqlite3.Database('moggesstore.db', (err) => {
     console.log('? Connected to database');
 });
 
-// Create Products table
-db.serialize(() => {
-    // Drop existing table to recreate with fresh data
+// Create tables
+db.serialize(async () => {
+    // Drop existing tables
     db.run('DROP TABLE IF EXISTS Products');
+    db.run('DROP TABLE IF EXISTS Users');
     
+    // Create Products table
     db.run(`
         CREATE TABLE Products (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,13 +28,33 @@ db.serialize(() => {
         )
     `, (err) => {
         if (err) {
-            console.error('? Error creating table:', err);
+            console.error('? Error creating Products table:', err);
             return;
         }
         console.log('? Products table created');
     });
 
-    // Insert all products
+    // Create Users table
+    db.run(`
+        CREATE TABLE Users (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Email TEXT UNIQUE NOT NULL,
+            Password TEXT NOT NULL,
+            Role TEXT NOT NULL DEFAULT 'user',
+            CreatedAt TEXT NOT NULL
+        )
+    `, (err) => {
+        if (err) {
+            console.error('? Error creating Users table:', err);
+            return;
+        }
+        console.log('? Users table created');
+    });
+
+    // Wait a bit for tables to be created
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Insert products
     const products = [
         {
             name: "Elegant Sommarklanning",
@@ -99,13 +122,13 @@ db.serialize(() => {
         }
     ];
 
-    const stmt = db.prepare(`
+    const productStmt = db.prepare(`
         INSERT INTO Products (Name, Description, Price, Category, Stock, Image)
         VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     products.forEach(product => {
-        stmt.run(
+        productStmt.run(
             product.name,
             product.description,
             product.price,
@@ -115,25 +138,45 @@ db.serialize(() => {
         );
     });
 
-    stmt.finalize((err) => {
+    productStmt.finalize();
+    console.log('? Inserted', products.length, 'products');
+
+    // Insert default admin user
+    const adminEmail = 'admin@moggesstore.se';
+    const adminPassword = 'admin123'; // Change this!
+    
+    bcrypt.hash(adminPassword, 10, (err, hash) => {
         if (err) {
-            console.error('? Error inserting products:', err);
+            console.error('? Error hashing password:', err);
             return;
         }
-        console.log('? Inserted', products.length, 'products');
         
-        // Verify data
-        db.all('SELECT * FROM Products', (err, rows) => {
+        db.run(`
+            INSERT INTO Users (Email, Password, Role, CreatedAt)
+            VALUES (?, ?, ?, ?)
+        `, [adminEmail, hash, 'admin', new Date().toISOString()], (err) => {
             if (err) {
-                console.error('? Error reading products:', err);
+                console.error('? Error creating admin user:', err);
                 return;
             }
-            console.log('\n?? Products in database:');
-            rows.forEach(row => {
-                console.log(`  - ${row.Name} (${row.Price} kr) - ${row.Category}`);
+            console.log('? Admin user created');
+            console.log('   Email:', adminEmail);
+            console.log('   Password:', adminPassword);
+            console.log('   ??  CHANGE THIS PASSWORD IN PRODUCTION!');
+            
+            // Verify data
+            db.all('SELECT * FROM Products', (err, rows) => {
+                if (err) {
+                    console.error('? Error reading products:', err);
+                    return;
+                }
+                console.log('\n?? Products in database:');
+                rows.forEach(row => {
+                    console.log(`  - ${row.Name} (${row.Price} kr) - ${row.Category}`);
+                });
+                console.log('\n? Database initialized successfully!\n');
+                db.close();
             });
-            console.log('\n? Database initialized successfully!\n');
-            db.close();
         });
     });
 });

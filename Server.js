@@ -4,6 +4,8 @@ const express = require('express');
 const path = require('path');
 const { exec } = require('child_process');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
+const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +19,17 @@ const db = new sqlite3.Database('moggesstore.db', (err) => {
     console.log('? Connected to database');
 });
 
+// Session middleware
+app.use(session({
+    secret: 'mogges-store-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true in production with HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
 // Disable caching for development
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -29,9 +42,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, 'docs')));
-app.use(express.json());
 
 // API Routes
 app.get('/api/products', (req, res) => {
@@ -59,6 +75,146 @@ app.get('/api/products/:id', (req, res) => {
     });
 });
 
+// Authentication middleware
+function requireAuth(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    next();
+}
+
+function requireAdmin(req, res, next) {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Forbidden - Admin access required' });
+    }
+    next();
+}
+
+// Auth API Routes
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password required' });
+    }
+    
+    db.get('SELECT * FROM Users WHERE Email = ?', [email], async (err, user) => {
+        if (err) {
+            console.error('? Error fetching user:', err);
+            return res.status(500).json({ error: 'Server error' });
+        }
+        
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        
+        const match = await bcrypt.compare(password, user.Password);
+        
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        
+        // Set session
+        req.session.user = {
+            id: user.Id,
+            email: user.Email,
+            role: user.Role
+        };
+        
+        console.log('? User logged in:', user.Email);
+        res.json({
+            message: 'Login successful',
+            user: {
+                email: user.Email,
+                role: user.Role
+            }
+        });
+    });
+});
+
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to logout' });
+        }
+        res.json({ message: 'Logout successful' });
+    });
+});
+
+app.get('/api/check-auth', (req, res) => {
+    if (req.session.user) {
+        res.json({
+            authenticated: true,
+            user: req.session.user
+        });
+    } else {
+        res.json({ authenticated: false });
+    }
+});
+
+// Admin API Routes
+app.post('/api/products', requireAdmin, (req, res) => {
+    const { name, description, price, category, stock, image } = req.body;
+    
+    if (!name || !price) {
+        return res.status(400).json({ error: 'Name and price are required' });
+    }
+    
+    db.run(`
+        INSERT INTO Products (Name, Description, Price, Category, Stock, Image)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `, [name, description, price, category, stock || 0, image || 'picture/1.jpg'], function(err) {
+        if (err) {
+            console.error('? Error creating product:', err);
+            return res.status(500).json({ error: 'Failed to create product' });
+        }
+        
+        res.json({
+            message: 'Product created',
+            id: this.lastID
+        });
+    });
+});
+
+app.put('/api/products/:id', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    const { name, description, price, category, stock, image } = req.body;
+    
+    db.run(`
+        UPDATE Products 
+        SET Name = ?, Description = ?, Price = ?, Category = ?, Stock = ?, Image = ?
+        WHERE Id = ?
+    `, [name, description, price, category, stock, image, id], function(err) {
+        if (err) {
+            console.error('? Error updating product:', err);
+            return res.status(500).json({ error: 'Failed to update product' });
+        }
+        
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        res.json({ message: 'Product updated' });
+    });
+});
+
+app.delete('/api/products/:id', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    
+    db.run('DELETE FROM Products WHERE Id = ?', [id], function(err) {
+        if (err) {
+            console.error('? Error deleting product:', err);
+            return res.status(500).json({ error: 'Failed to delete product' });
+        }
+        
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        res.json({ message: 'Product deleted' });
+    });
+});
+
 // Route for main page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'index', 'index.html'));
@@ -83,6 +239,18 @@ app.get('/index.html', (req, res) => {
 
 app.get('/checkout.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'index', 'checkout.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'login.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+    // Check if user is admin
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login.html');
+    }
+    res.sendFile(path.join(__dirname, 'docs', 'index', 'admin.html'));
 });
 
 // Start server
