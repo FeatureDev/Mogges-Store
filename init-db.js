@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database('moggesstore.db', (err) => {
     if (err) {
-        console.error('Error opening database:', err);
+        console.error('? Error opening database:', err);
         process.exit(1);
     }
     console.log('? Connected to database');
@@ -10,78 +10,130 @@ const db = new sqlite3.Database('moggesstore.db', (err) => {
 
 // Create Products table
 db.serialize(() => {
+    // Drop existing table to recreate with fresh data
+    db.run('DROP TABLE IF EXISTS Products');
+    
     db.run(`
-        CREATE TABLE IF NOT EXISTS Products (
+        CREATE TABLE Products (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Name TEXT NOT NULL,
             Description TEXT,
             Price REAL NOT NULL,
             Stock INTEGER NOT NULL DEFAULT 0,
             Category TEXT,
-            CreatedAt TEXT NOT NULL,
-            UpdatedAt TEXT
+            Image TEXT
         )
+    `, (err) => {
+        if (err) {
+            console.error('? Error creating table:', err);
+            return;
+        }
+        console.log('? Products table created');
+    });
+
+    // Insert all products
+    const products = [
+        {
+            name: "Elegant Sommarklanning",
+            description: "Latt och luftig klanning perfekt for varma sommardagar",
+            price: 599,
+            category: "Dam Mode",
+            stock: 15,
+            image: "picture/1.jpg"
+        },
+        {
+            name: "Modern Herrjacka",
+            description: "Stilren jacka for bade vardag och fest",
+            price: 899,
+            category: "Herr Mode",
+            stock: 8,
+            image: "picture/2.jpg"
+        },
+        {
+            name: "Designervaska",
+            description: "Exklusiv handvaska i akta lader",
+            price: 1299,
+            category: "Accessoarer",
+            stock: 5,
+            image: "picture/3.jpg"
+        },
+        {
+            name: "Klassisk Blus",
+            description: "Tidlos blus som passar till allt",
+            price: 449,
+            category: "Dam Mode",
+            stock: 20,
+            image: "picture/4.jpg"
+        },
+        {
+            name: "Sport Sneakers",
+            description: "Bekvama och moderna sneakers",
+            price: 799,
+            category: "Skor",
+            stock: 12,
+            image: "picture/5.jpg"
+        },
+        {
+            name: "Vinterkappa Dam",
+            description: "Varm och stilfull vinterkappa",
+            price: 1599,
+            category: "Dam Mode",
+            stock: 6,
+            image: "picture/1.jpg"
+        },
+        {
+            name: "Herrskjorta Premium",
+            description: "Hogkvalitativ bomullsskjorta",
+            price: 549,
+            category: "Herr Mode",
+            stock: 18,
+            image: "picture/2.jpg"
+        },
+        {
+            name: "Solglasogon Designer",
+            description: "Trendiga solglasogon med UV-skydd",
+            price: 399,
+            category: "Accessoarer",
+            stock: 25,
+            image: "picture/3.jpg"
+        }
+    ];
+
+    const stmt = db.prepare(`
+        INSERT INTO Products (Name, Description, Price, Category, Stock, Image)
+        VALUES (?, ?, ?, ?, ?, ?)
     `);
 
-    // Check if products already exist
-    db.get('SELECT COUNT(*) as count FROM Products', [], (err, row) => {
+    products.forEach(product => {
+        stmt.run(
+            product.name,
+            product.description,
+            product.price,
+            product.category,
+            product.stock,
+            product.image
+        );
+    });
+
+    stmt.finalize((err) => {
         if (err) {
-            console.error('Error checking products:', err);
+            console.error('? Error inserting products:', err);
+            return;
+        }
+        console.log('? Inserted', products.length, 'products');
+        
+        // Verify data
+        db.all('SELECT * FROM Products', (err, rows) => {
+            if (err) {
+                console.error('? Error reading products:', err);
+                return;
+            }
+            console.log('\n?? Products in database:');
+            rows.forEach(row => {
+                console.log(`  - ${row.Name} (${row.Price} kr) - ${row.Category}`);
+            });
+            console.log('\n? Database initialized successfully!\n');
             db.close();
-            process.exit(1);
-        }
-
-        if (row.count === 0) {
-            console.log('?? Seeding database with products...');
-            
-            const products = [
-                ['Smartphone Pro X', 'Senaste modellen med fantastisk kamera och prestanda', 8999.00, 25, 'Electronics', new Date().toISOString()],
-                ['Tradlos Horlurar', 'Noise-cancelling och lang batteritid', 1499.00, 50, 'Electronics', new Date().toISOString()],
-                ['Laptop Ultra', 'Kraftfull laptop for arbete och lek', 12999.00, 15, 'Electronics', new Date().toISOString()],
-                ['Smart Klocka', 'Folj din halsa och fitness', 2499.00, 30, 'Electronics', new Date().toISOString()],
-                ['T-shirt Premium', 'Bekvm bomullst-shirt i hog kvalitet', 299.00, 100, 'Clothing', new Date().toISOString()],
-                ['Jeans Classic', 'Klassiska jeans som passar alla', 699.00, 75, 'Clothing', new Date().toISOString()],
-                ['Programmeringens Konst', 'Larbok for seriosa programmerare', 549.00, 20, 'Books', new Date().toISOString()],
-                ['Yogamatta Pro', 'Halkfri och bekvm yogamatta', 399.00, 40, 'Sports', new Date().toISOString()],
-                ['Kaffemaskin Deluxe', 'Brygg perfekt kaffe varje gang', 1899.00, 12, 'Home', new Date().toISOString()],
-                ['Tradgardsset', 'Komplett set for tradgardsskotsel', 899.00, 8, 'Garden', new Date().toISOString()]
-            ];
-
-            const stmt = db.prepare(`
-                INSERT INTO Products (Name, Description, Price, Stock, Category, CreatedAt)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `);
-
-            products.forEach(product => {
-                stmt.run(product, (err) => {
-                    if (err) {
-                        console.error('Error inserting product:', err);
-                    }
-                });
-            });
-
-            stmt.finalize((err) => {
-                if (err) {
-                    console.error('Error finalizing statement:', err);
-                } else {
-                    console.log('? Database seeded successfully!');
-                }
-                closeDatabase();
-            });
-        } else {
-            console.log('? Database already contains products');
-            closeDatabase();
-        }
+        });
     });
 });
-
-function closeDatabase() {
-    db.close((err) => {
-        if (err) {
-            console.error('Error closing database:', err);
-        } else {
-            console.log('?? Database initialization complete!');
-        }
-    });
-}
-

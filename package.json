@@ -5,16 +5,17 @@
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js",
-    "dev": "start.ps1",
+    "init-db": "node init-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["github-pages", "static-site"],
+  "keywords": [
+    "github-pages",
+    "static-site"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "eslint": "^9.39.2"
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7"
   }
 }
