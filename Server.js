@@ -23,8 +23,8 @@ app.use(express.json());
 const products = [
     {
         id: 1,
-        name: "Elegant Sommarklänning",
-        description: "Lätt och luftig klänning perfekt för varma sommardagar",
+        name: "Elegant Sommarklanning",
+        description: "Latt och luftig klanning perfekt for varma sommardagar",
         price: 599,
         category: "Dam Mode",
         stock: 15,
@@ -33,7 +33,7 @@ const products = [
     {
         id: 2,
         name: "Modern Herrjacka",
-        description: "Stilren jacka för både vardag och fest",
+        description: "Stilren jacka for bade vardag och fest",
         price: 899,
         category: "Herr Mode",
         stock: 8,
@@ -41,8 +41,8 @@ const products = [
     },
     {
         id: 3,
-        name: "Designerväska",
-        description: "Exklusiv handväska i äkta läder",
+        name: "Designervaska",
+        description: "Exklusiv handvaska i akta lader",
         price: 1299,
         category: "Accessoarer",
         stock: 5,
@@ -51,7 +51,7 @@ const products = [
     {
         id: 4,
         name: "Klassisk Blus",
-        description: "Tidlös blus som passar till allt",
+        description: "Tidlos blus som passar till allt",
         price: 449,
         category: "Dam Mode",
         stock: 20,
@@ -60,7 +60,7 @@ const products = [
     {
         id: 5,
         name: "Sport Sneakers",
-        description: "Bekväma och moderna sneakers",
+        description: "Bekvama och moderna sneakers",
         price: 799,
         category: "Skor",
         stock: 12,
@@ -78,7 +78,7 @@ const products = [
     {
         id: 7,
         name: "Herrskjorta Premium",
-        description: "Högkvalitativ bomullsskjorta",
+        description: "Hogkvalitativ bomullsskjorta",
         price: 549,
         category: "Herr Mode",
         stock: 18,
@@ -86,8 +86,8 @@ const products = [
     },
     {
         id: 8,
-        name: "Solglasögon Designer",
-        description: "Trendiga solglasögon med UV-skydd",
+        name: "Solglasogon Designer",
+        description: "Trendiga solglasogon med UV-skydd",
         price: 399,
         category: "Accessoarer",
         stock: 25,
