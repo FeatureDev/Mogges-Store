@@ -2,6 +2,7 @@
 
 const express = require('express');
 const path = require('path');
+const { exec } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -124,7 +125,6 @@ app.listen(PORT, () => {
     console.log('Press Ctrl+C to stop the server');
     
     // Open browser automatically
-    const { exec } = require('child_process');
     const url = `http://localhost:${PORT}`;
     
     // Wait a moment for server to be fully ready
