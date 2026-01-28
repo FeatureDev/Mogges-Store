@@ -1,16 +1,38 @@
 console.log('?? Checkout page loaded');
 
+const API_URL = `${API_BASE_URL}/api/products`;
+let products = [];
+
 // Update cart count in nav
 function updateCartCount() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
     const cartCountElements = document.querySelectorAll('.cart-count');
-    cartCountElements.forEach(el => el.textContent = cartCount);
-    console.log('?? Cart count updated:', cartCount);
+    cartCountElements.forEach(el => {
+        el.textContent = cartCount;
+        el.style.display = cartCount > 0 ? 'flex' : 'none';
+    });
+    console.log('? Cart count updated:', cartCount);
+}
+
+// Load products from API
+async function loadProducts() {
+    try {
+        console.log('?? Loading products from API...');
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Failed to fetch products');
+        
+        products = await response.json();
+        console.log('? Products loaded:', products.length);
+        return products;
+    } catch (error) {
+        console.error('? Error loading products:', error);
+        return [];
+    }
 }
 
 // Load order items from cart
-function loadOrderItems() {
+async function loadOrderItems() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     console.log('?? Loading cart items:', cart);
     
@@ -27,13 +49,31 @@ function loadOrderItems() {
         return;
     }
     
-    console.log('? Rendering', cart.length, 'items');
+    // Load products if not already loaded
+    if (products.length === 0) {
+        await loadProducts();
+    }
     
-    orderItemsContainer.innerHTML = cart.map(item => {
+    // Match cart items with product data
+    const orderItems = cart.map(cartItem => {
+        const product = products.find(p => p.id === cartItem.id);
+        if (!product) {
+            console.warn('?? Product not found for cart item:', cartItem);
+            return null;
+        }
+        return {
+            ...product,
+            quantity: cartItem.quantity
+        };
+    }).filter(item => item !== null);
+    
+    console.log('? Rendering', orderItems.length, 'items');
+    
+    orderItemsContainer.innerHTML = orderItems.map(item => {
         console.log('Rendering item:', item.name, 'Price:', item.price, 'Quantity:', item.quantity);
         return `
         <div class="order-item">
-            <img src="../${item.image}" alt="${item.name}" class="order-item-image" onerror="console.error('Failed to load image: ${item.image}')">
+            <img src="${item.image}" alt="${item.name}" class="order-item-image" onerror="console.error('Failed to load image: ${item.image}'); this.src='picture/placeholder.png'">
             <div class="order-item-details">
                 <div class="order-item-name">${item.name}</div>
                 <div class="order-item-quantity">Antal: ${item.quantity}</div>
@@ -43,12 +83,12 @@ function loadOrderItems() {
     `;
     }).join('');
     
-    calculateTotals(cart);
+    calculateTotals(orderItems);
 }
 
 // Calculate all totals
-function calculateTotals(cart) {
-    const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+function calculateTotals(orderItems) {
+    const subtotal = orderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const shippingCost = subtotal >= 500 ? 0 : 49; // Free shipping over 500 kr
     const vatRate = 0.25; // 25% VAT
     const subtotalBeforeVat = subtotal / (1 + vatRate);
@@ -93,7 +133,7 @@ if (confirmButton) {
         
         // Simulate payment processing
         setTimeout(() => {
-            alert('Betalning bekraftad! \n\nDin order har skickats. \nTack for ditt kop!');
+            alert('Betalning bekräftad! \n\nDin order har skickats. \nTack för ditt köp!');
             
             // Clear cart
             localStorage.removeItem('cart');
