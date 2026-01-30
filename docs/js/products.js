@@ -16,7 +16,11 @@ async function loadFeaturedProducts() {
     console.log('?? loadFeaturedProducts() called');
     try {
         console.log('?? Fetching from:', API_URL);
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
         console.log('?? Response status:', response.status);
         if (!response.ok) throw new Error('Failed to fetch products');
         
@@ -75,7 +79,11 @@ function displayFeaturedProducts(products) {
 async function loadAllProducts() {
     try {
         console.log('🔄 Fetching from:', API_URL);
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -158,7 +166,11 @@ function filterProducts() {
 // ===== CART FUNCTIONS =====
 async function loadCart() {
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch products');
         
         products = await response.json();
@@ -312,20 +324,24 @@ function getStockText(stock) {
 }
 
 async function addToCart(productId) {
-    // Fetch product details from API if not already loaded
-    if (allProducts.length === 0 && products.length === 0) {
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error('Failed to fetch products');
-            const productsData = await response.json();
-            allProducts = productsData;
-            products = productsData;
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            showNotification('Kunde inte lagga till produkt');
-            return;
-        }
+// Fetch product details from API if not already loaded
+if (allProducts.length === 0 && products.length === 0) {
+    try {
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const productsData = await response.json();
+        allProducts = productsData;
+        products = productsData;
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        showNotification('Kunde inte lagga till produkt');
+        return;
     }
+}
     
     // Find the product
     const product = allProducts.find(p => p.id === productId) || products.find(p => p.id === productId);
