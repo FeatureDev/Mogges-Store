@@ -215,18 +215,18 @@ app.put('/api/products/:id', requireAdmin, (req, res) => {
 app.delete('/api/products/:id', requireAdmin, (req, res) => {
     const id = parseInt(req.params.id);
     
-    db.run('DELETE FROM Products WHERE Id = ?', [id], function(err) {
-        if (err) {
-            console.error('? Error deleting product:', err);
-            return res.status(500).json({ error: 'Failed to delete product' });
-        }
+    try {
+        const result = database.run('DELETE FROM Products WHERE Id = ?', [id]);
         
-        if (this.changes === 0) {
+        if (result.changes === 0) {
             return res.status(404).json({ error: 'Product not found' });
         }
         
         res.json({ message: 'Product deleted' });
-    });
+    } catch (err) {
+        console.error('? Error deleting product:', err);
+        res.status(500).json({ error: 'Failed to delete product' });
+    }
 });
 
 // Route for main page
