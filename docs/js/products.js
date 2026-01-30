@@ -74,20 +74,26 @@ function displayFeaturedProducts(products) {
 // ===== ALL PRODUCTS (Products Page) =====
 async function loadAllProducts() {
     try {
+        console.log('🔄 Fetching from:', API_URL);
         const response = await fetch(API_URL);
 
-        if (!response.ok) throw new Error('Failed to fetch products');
-        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         allProducts = await response.json();
         filteredProducts = [...allProducts];
+        
+        console.log('✅ Products loaded:', allProducts.length);
         
         displayProducts(filteredProducts);
         populateCategoryFilter();
     } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('❌ Error loading products:', error);
         displayError('all-products');
     }
 }
+
 
 function displayProducts(products) {
     const container = document.getElementById('all-products');
