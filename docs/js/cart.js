@@ -9,12 +9,16 @@ let products = [];
 
 // ===== FEATURED PRODUCTS (Home Page) =====
 async function loadFeaturedProducts() {
-    console.log('?? loadFeaturedProducts() called');
-    try {
-        console.log('?? Fetching from:', API_URL);
-        const response = await fetch(API_URL);
-        console.log('?? Response status:', response.status);
-        if (!response.ok) throw new Error('Failed to fetch products');
+console.log('?? loadFeaturedProducts() called');
+try {
+    console.log('?? Fetching from:', API_URL);
+    const response = await fetch(API_URL, {
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    console.log('?? Response status:', response.status);
+    if (!response.ok) throw new Error('Failed to fetch products');
         
         const productsData = await response.json();
         console.log('? Products loaded:', productsData.length);
@@ -69,9 +73,13 @@ function displayFeaturedProducts(products) {
 
 // ===== ALL PRODUCTS (Products Page) =====
 async function loadAllProducts() {
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Failed to fetch products');
+try {
+    const response = await fetch(API_URL, {
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    if (!response.ok) throw new Error('Failed to fetch products');
         
         allProducts = await response.json();
         filteredProducts = [...allProducts];
@@ -146,12 +154,16 @@ function filterProducts() {
 
 // ===== CART FUNCTIONS =====
 async function loadCart() {
-    try {
-        console.log('📦 Loading cart...');
-        console.log('📦 API URL:', API_URL);
+try {
+    console.log('📦 Loading cart...');
+    console.log('📦 API URL:', API_URL);
         
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Failed to fetch products');
+    const response = await fetch(API_URL, {
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    if (!response.ok) throw new Error('Failed to fetch products');
         
         products = await response.json();
         console.log('✅ Products loaded:', products.length);

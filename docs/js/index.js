@@ -16,7 +16,11 @@ async function loadFeaturedProducts() {
     console.log('?? loadFeaturedProducts() called');
     try {
         console.log('?? Fetching from:', API_URL);
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
         console.log('?? Response status:', response.status);
         if (!response.ok) throw new Error('Failed to fetch products');
         
@@ -74,7 +78,11 @@ function displayFeaturedProducts(products) {
 // ===== ALL PRODUCTS (Products Page) =====
 async function loadAllProducts() {
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch products');
         
         allProducts = await response.json();
@@ -151,7 +159,11 @@ function filterProducts() {
 // ===== CART FUNCTIONS =====
 async function loadCart() {
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch products');
         
         products = await response.json();
