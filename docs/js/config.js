@@ -9,10 +9,10 @@ const CONFIG = {
     
     // Ngrok tunnel (replace with your ngrok URL)
     // Example: https://abc123.ngrok-free.app
-    NGROK_API: 'https://YOUR-NGROK-URL.ngrok-free.app', // CHANGE THIS!
+    NGROK_API: 'https://colourful-grant-semiliberally.ngrok-free.dev',
     
     // Choose mode: 'local', 'phone', or 'ngrok'
-    MODE: 'phone'
+    MODE: 'ngrok'
 };
 
 // Get the active API URL based on mode
