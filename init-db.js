@@ -1,5 +1,5 @@
-const database = require('./database');
-const bcrypt = require('bcryptjs');
+import * as database from './database.js';
+import bcrypt from 'bcryptjs';
 
 async function initializeDatabase() {
     try {

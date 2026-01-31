@@ -1,7 +1,7 @@
 'use strict';
 
-const initSqlJs = require('sql.js');
-const fs = require('fs');
+import initSqlJs from 'sql.js';
+import fs from 'fs';
 
 let SQL;
 let db;
@@ -102,7 +102,7 @@ function close() {
     }
 }
 
-module.exports = {
+export {
     initDatabase,
     saveDatabase,
     all,

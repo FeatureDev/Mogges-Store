@@ -1,11 +1,11 @@
 'use strict';
 
-const express = require('express');
-const path = require('path');
-const { exec } = require('child_process');
-const database = require('./database');
-const bcrypt = require('bcryptjs');
-const session = require('express-session');
+import express from 'express';
+import path from 'path';
+import { exec } from 'child_process';
+import * as database from './database.js';
+import bcrypt from 'bcryptjs';
+import session from 'express-session';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
