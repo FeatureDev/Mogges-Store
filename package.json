@@ -1,10 +1,12 @@
 {
-"name": "github-pages-project",
-"version": "1.0.0",
-"description": "En statisk webbsida för GitHub Pages",
+  "name": "github-pages-project",
+  "version": "1.0.0",
+  "description": "En statisk webbsida för GitHub Pages",
+  "type": "module",
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js",
+    "preview": "node preview-server.js",
     "init-db": "node init-db.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
