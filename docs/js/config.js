@@ -9,9 +9,12 @@ export const CONFIG = {
     
     // Ngrok tunnel (replace with your ngrok URL)
     // Example: https://abc123.ngrok-free.app
-    NGROK_API: 'https://colourful-grant-semiliberally.ngrok-free.dev',
+    NGROK_API: 'https://mogges-store.se',
     
-    // Choose mode: 'local', 'phone', or 'ngrok'
+    // Production domain API
+    PRODUCTION_API: 'https://api.mogges-store.se',
+    
+    // Choose mode: 'local', 'phone', 'ngrok', or 'production'
     MODE: 'ngrok'
 };
 
@@ -22,6 +25,8 @@ function getApiUrl() {
             return CONFIG.PHONE_API;
         case 'ngrok':
             return CONFIG.NGROK_API;
+        case 'production':
+            return CONFIG.PRODUCTION_API;
         case 'local':
         default:
             return CONFIG.LOCAL_API;
