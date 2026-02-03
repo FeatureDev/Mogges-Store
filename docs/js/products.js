@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 import { API_BASE_URL } from './config.js';
+import { addToCart as addToCartCommon, updateCartCount } from './cart-common.js';
 
 console.log('Hello world');
 
@@ -343,7 +344,6 @@ if (allProducts.length === 0 && products.length === 0) {
         showNotification('Kunde inte lagga till produkt');
         return;
     }
-}
     
     // Find the product
     const product = allProducts.find(p => p.id === productId) || products.find(p => p.id === productId);
@@ -354,28 +354,14 @@ if (allProducts.length === 0 && products.length === 0) {
         return;
     }
     
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    // Use common cart function
+    const success = addToCartCommon(product);
     
-    const existingItem = cart.find(item => item.id === productId);
-    if (existingItem) {
-        existingItem.quantity++;
+    if (success) {
+        showNotification('Produkt tillagd i varukorgen!');
     } else {
-        // Save complete product info
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            category: product.category,
-            quantity: 1
-        });
+        showNotification('Kunde inte lagga till produkt');
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
-    
-    console.log('✅ Added to cart:', product.name);
-    showNotification('Produkt tillagd i varukorgen!');
 }
 
 function updateCartCount() {
@@ -455,8 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadCart();
     }
     
-    // Update cart count on all pages
-    updateCartCount();
+    // Cart count is now updated automatically by cart-common.js
     
     // Handle click button if it exists (for demo page)
     const button = document.getElementById('clickButton');

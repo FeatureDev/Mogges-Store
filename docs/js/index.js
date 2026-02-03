@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 import { API_BASE_URL } from './config.js';
+import { addToCart as addToCartCommon, updateCartCount } from './cart-common.js';
 
 console.log('Hello world');
 
