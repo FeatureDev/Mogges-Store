@@ -301,6 +301,22 @@ window.editProduct = function(id) {
 window.deleteProduct = async function(id) {
     if (!confirm('Ar du saker pa att du vill ta bort denna produkt?')) return;
     
+    // Find the product card and add deleting animation
+    const productCards = document.querySelectorAll('.product-card');
+    let productCard = null;
+    productCards.forEach(card => {
+        const editBtn = card.querySelector('button[onclick*="editProduct"]');
+        if (editBtn && editBtn.onclick.toString().includes(`(${id})`)) {
+            productCard = card;
+        }
+    });
+    
+    // Add fade-out animation
+    if (productCard) {
+        productCard.style.opacity = '0.5';
+        productCard.style.pointerEvents = 'none';
+    }
+    
     try {
         const response = await fetch(`${API_URL}/api/products/${id}`, {
             method: 'DELETE',
@@ -310,12 +326,30 @@ window.deleteProduct = async function(id) {
         const data = await response.json();
         
         if (!response.ok) {
+            // Restore card if failed
+            if (productCard) {
+                productCard.style.opacity = '1';
+                productCard.style.pointerEvents = 'auto';
+            }
             throw new Error(data.error || 'Failed to delete product');
         }
         
         console.log('? Product deleted');
-        alert('Produkt borttagen!');
-        await loadProducts();
+        
+        // Remove from products array
+        products = products.filter(p => p.id !== id);
+        
+        // Animate removal
+        if (productCard) {
+            productCard.style.transform = 'scale(0)';
+            productCard.style.transition = 'all 0.3s ease';
+            setTimeout(() => {
+                displayProducts();
+            }, 300);
+        } else {
+            displayProducts();
+        }
+        
     } catch (error) {
         console.error('Error deleting product:', error);
         alert('Kunde inte ta bort produkt: ' + error.message);
@@ -339,6 +373,7 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
         const url = editingProductId ? `${API_URL}/api/products/${editingProductId}` : `${API_URL}/api/products`;
         const method = editingProductId ? 'PUT' : 'POST';
         
+        
         const response = await fetch(url, {
             method,
             headers: {
@@ -348,17 +383,41 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
             body: JSON.stringify(formData)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error);
+            throw new Error(data.error || 'Failed to save product');
         }
         
         console.log('? Product saved');
-        alert(editingProductId ? 'Produkt uppdaterad!' : 'Produkt tillagd!');
         
-        // Close modal and reload
+        // Update products array immediately
+        if (editingProductId) {
+            // Update existing product
+            const index = products.findIndex(p => p.id === editingProductId);
+            if (index !== -1) {
+                products[index] = { ...products[index], ...formData };
+            }
+        } else {
+            // Add new product with ID from response
+            products.push({ id: data.id, ...formData });
+        }
+        
+        // Close modal and update display
         document.getElementById('product-modal').classList.remove('show');
-        loadProducts();
+        const preview = document.getElementById('current-image-preview');
+        if (preview) preview.style.display = 'none';
+        
+        // Update display immediately
+        displayProducts();
+        
+        // Show success message briefly
+        const successMsg = document.createElement('div');
+        successMsg.className = 'success-toast';
+        successMsg.textContent = editingProductId ? '? Produkt uppdaterad!' : '? Produkt skapad!';
+        document.body.appendChild(successMsg);
+        setTimeout(() => successMsg.remove(), 2000);
+        
     } catch (error) {
         console.error('Error saving product:', error);
         alert('Kunde inte spara produkt: ' + error.message);
