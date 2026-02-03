@@ -189,16 +189,99 @@ Cloudflare:
 
 ?? NÄSTA UTVECKLINGSSTEG
 ================================================================================
-1. Betalningsintegration (Stripe/Klarna)
-2. Email-notifikationer (nodemailer)
-3. Kundkonton med order-historik
-4. Produktrecensioner och betyg
-5. Filtrera produkter på flera attribut
-6. Bilduppladdning istället för bara välja befintliga
-7. Avancerad lagerhantering
-8. Google Analytics eller Plausible
-9. SEO-optimering (meta tags, sitemap)
-10. Automatisk backup av databas
+?? PRIORITET 1: CLOUDFLARE WORKERS + D1 (Serverless Backend)
+--------------------------------------------------------------------------------
+Målet är att flytta backend från lokal dator till Cloudflare Workers så att 
+hela applikationen körs i molnet utan behov av egen server.
+
+VARFÖR CLOUDFLARE WORKERS + D1?
+- ? Backend körs 24/7 utan egen server
+- ? SQLite databas i molnet (Cloudflare D1)
+- ? Gratis tier: 100,000 requests/dag
+- ? Automatisk skalning globalt
+- ? Ingen Cloudflare Tunnel behövs
+- ? Lägre latency (servrar världen över)
+
+MIGRATIONSPLAN:
+1. Skapa Cloudflare Worker för API
+   - Konvertera Server.js till Workers format
+   - Använd Hono framework (lättare än Express för Workers)
+   
+2. Migrera databas till Cloudflare D1
+   - Skapa D1 databas: wrangler d1 create mogges-store-db
+   - Migrera schema från moggesstore.db
+   - Importera befintliga produkter
+   
+3. Konfigurera Workers
+   - Binda D1 databas till Worker
+   - Sätt environment variables (SESSION_SECRET)
+   - Konfigurera CORS för mogges-store.se
+   
+4. Uppdatera Frontend
+   - config.js pekar på Workers URL
+   - Ingen ändring i frontend-kod behövs
+
+KOMMANDON FÖR SETUP:
+```bash
+# 1. Skapa Worker-projekt
+npx wrangler init mogges-workers
+
+# 2. Skapa D1 databas
+npx wrangler d1 create mogges-store-db
+
+# 3. Skapa schema i D1
+npx wrangler d1 execute mogges-store-db --file=./schema.sql
+
+# 4. Importera data
+npx wrangler d1 execute mogges-store-db --file=./seed.sql
+
+# 5. Deploya Worker
+npx wrangler deploy
+```
+
+FILER SOM BEHÖVER SKAPAS:
+- src/worker.js          (Worker kod, ersätter Server.js)
+- wrangler.toml          (Worker konfiguration)
+- schema.sql             (D1 databas-schema)
+- seed.sql               (Initial data för D1)
+
+TEKNISK STACK EFTER MIGRERING:
+- Frontend: Cloudflare Pages (som nu)
+- Backend: Cloudflare Workers (istället för Server.js)
+- Databas: Cloudflare D1 (istället för moggesstore.db)
+- Auth: Workers KV eller D1 för sessions
+
+KOSTNAD:
+- Gratis tier: 100,000 requests/dag
+- D1: 5 GB gratis
+- Perfekt för utveckling och små/medelstora butiker
+
+NÄSTA SESSION:
+1. Öppna latest_info.txt
+2. Följ MIGRATIONSPLAN ovan
+3. Vi skapar Worker-kod och migrerar databas
+4. Deployer till Cloudflare Workers
+5. Tar bort behovet av lokal server + tunnel
+
+FÖRBEREDELSER (gör nu om du vill):
+- Säkerhetskopiera moggesstore.db
+- Exportera produktdata till JSON/SQL
+- Ha Cloudflare-kontot klart (redan inloggad via wrangler)
+
+================================================================================
+
+ÖVRIGA UTVECKLINGSSTEG (efter Workers-migration):
+================================================================================
+2. Betalningsintegration (Stripe/Klarna)
+3. Email-notifikationer (nodemailer eller Resend via Workers)
+4. Kundkonton med order-historik
+5. Produktrecensioner och betyg
+6. Filtrera produkter på flera attribut
+7. Bilduppladdning till R2 (Cloudflares S3-liknande storage)
+8. Avancerad lagerhantering
+9. Google Analytics eller Plausible
+10. SEO-optimering (meta tags, sitemap)
+11. Automatisk backup av D1 databas
 
 ?? TIPS FÖR FRAMTIDEN
 ================================================================================
