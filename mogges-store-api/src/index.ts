@@ -23,7 +23,7 @@ app.use(
 			'http://127.0.0.1:8080'
 		],
 		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-		allowHeaders: ['Content-Type', 'Authorization'],
+		allowHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
 		credentials: true
 	})
 );
