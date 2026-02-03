@@ -1,0 +1,280 @@
+================================================================================
+MOGGES STORE - E-HANDEL PROJEKT INFO
+Senast uppdaterad: 2026-02-03
+================================================================================
+
+?? LIVE URLS
+================================================================================
+Frontend:    https://mogges-store.se
+Backend API: https://api.mogges-store.se
+Admin:       https://mogges-store.se/admin.html
+GitHub:      https://github.com/FeatureDev/Node_Android_project
+Branch:      main
+
+?? ADMIN LOGIN
+================================================================================
+Email:       admin@moggesstore.se
+Password:    admin123
+
+?? PROJEKT STRUKTUR
+================================================================================
+Root:        C:\Users\morga\source\repos\Node_android_project
+Frontend:    docs/
+Backend:     Server.js, database.js
+Database:    moggesstore.db (SQLite via sql.js)
+Config:      docs/js/config.js
+Tunnel:      tunnel-config.yml, cloudflared.exe
+
+??? TEKNISK STACK
+================================================================================
+Frontend:
+- HTML5, CSS3, JavaScript (ES6 Modules)
+- Cloudflare Pages (auto-deploy från GitHub)
+- PWA-ready med service worker
+
+Backend:
+- Node.js 18+ med Express.js
+- SQLite (sql.js för in-memory/file-based DB)
+- bcryptjs för lösenordshashing
+- express-session för autentisering
+- CORS enabled för cross-origin
+
+Deployment:
+- Frontend: Cloudflare Pages (GitHub integration)
+- Backend: Lokalt via Cloudflare Tunnel
+- Tunnel ID: 848f9056-284e-4755-b3eb-00afaea705b3
+- Tunnel namn: mogges-backend
+
+?? STARTA PROJEKTET
+================================================================================
+1. Backend Server (Port 3000):
+   npm start
+
+2. Frontend Preview (Port 8080 - lokal testning):
+   npm run preview
+
+3. Cloudflare Tunnel (HTTPS till backend):
+   .\cloudflared.exe tunnel --config tunnel-config.yml run mogges-backend
+
+VIKTIGT: Alla 3 måste köra för att siten ska fungera på internet!
+
+?? DATABAS INFO
+================================================================================
+Fil:           moggesstore.db
+Library:       sql.js (SQLite compiled to WebAssembly)
+Init script:   init-db.js (skapar tabeller och seeddata)
+
+Tabeller:
+- Users (Id, Email, Password, Role)
+- Products (Id, Name, Description, Price, Category, Stock, Image)
+
+Kör init-db.js om databasen behöver återställas:
+   node init-db.js
+
+?? VIKTIGA KONFIGURATIONER
+================================================================================
+docs/js/config.js:
+- MODE: 'production' (använder PRODUCTION_API)
+- PRODUCTION_API: 'https://api.mogges-store.se'
+- PHONE_API: 'http://194.47.40.60:3000' (WiFi-samma nätverk)
+- LOCAL_API: 'http://localhost:3000'
+
+tunnel-config.yml:
+- tunnel: 848f9056-284e-4755-b3eb-00afaea705b3
+- protocol: http2 (ej quic pga nätverksblockeringar)
+- service: http://127.0.0.1:3000 (IPv4, ej localhost/IPv6)
+
+Server.js CORS:
+- Tillåter: localhost:8080, mogges-store.se, www.mogges-store.se
+- Credentials: true (för sessions)
+
+.env filen:
+- SESSION_SECRET (genererad automatiskt om den saknas)
+- PORT=3000
+
+? FUNKTIONER SOM FUNGERAR
+================================================================================
+? Produkter laddas dynamiskt från API
+? Cart (lägg till, ta bort, +/-, localStorage)
+? Cart-räknare uppdateras automatiskt (cart-common.js)
+? Admin-panel med CRUD operationer
+? Visuell bildväljare (docs/picture/)
+? Redigera/ta bort produkter (direkt uppdatering, inga alerts)
+? Svenska tecken (å, ä, ö) fungerar överallt
+? Toast-notifikationer istället för alerts
+? Smooth animationer vid add/delete
+? Session-baserad autentisering
+? HTTPS överallt (Cloudflare Tunnel + Pages)
+? Responsiv design (desktop + mobile)
+
+?? KÄNDA PROBLEM & LÖSNINGAR
+================================================================================
+Problem: "Mixed Content" när telefon försöker nå HTTP API från HTTPS-sida
+Lösning: Cloudflare Tunnel ger HTTPS gratis ? api.mogges-store.se
+
+Problem: Cloudflare Tunnel timeout med QUIC-protokoll
+Lösning: Använd HTTP/2 istället (protocol: http2 i tunnel-config.yml)
+
+Problem: Tunnel kan inte nå localhost:3000
+Lösning: Använd 127.0.0.1:3000 istället (IPv4 explicit)
+
+Problem: addToCart, updateQuantity, removeFromCart fungerar inte
+Lösning: Funktioner måste exponeras globalt (window.functionName = functionName)
+
+Problem: Cart-räknare uppdateras inte
+Lösning: Skapat cart-common.js som importeras i alla sidor
+
+Problem: Svenska tecken visas som ??
+Lösning: Fixat encoding i alla HTML/JS filer + express charset: 'utf-8'
+
+?? NPM PACKAGES
+================================================================================
+Dependencies:
+- express
+- express-session
+- bcryptjs
+- dotenv
+- sql.js
+
+DevDependencies:
+- http-server (för preview)
+
+Global:
+- wrangler (Cloudflare CLI)
+- cloudflared (finns lokalt i projektet)
+
+?? GIT WORKFLOW
+================================================================================
+Branch: main
+Remote: origin (https://github.com/FeatureDev/Node_Android_project)
+
+Cloudflare Pages auto-deployer från GitHub:
+- Push till main ? Auto-deploy till mogges-store.se
+- Build command: (ingen, statiska filer från docs/)
+- Output directory: docs
+
+Committa ändringar:
+   git add .
+   git commit -m "message"
+   git push
+
+?? VIKTIGA FILER
+================================================================================
+Backend:
+- Server.js            (Express server, API routes, CORS, sessions)
+- database.js          (SQLite wrapper för sql.js)
+- init-db.js           (Skapa/återställ databas)
+- moggesstore.db       (SQLite databas-fil)
+- .env                 (SESSION_SECRET)
+- package.json         (scripts: start, preview)
+
+Frontend:
+- docs/index.html      (Startsida)
+- docs/products.html   (Alla produkter)
+- docs/cart.html       (Varukorg)
+- docs/admin.html      (Admin-panel)
+- docs/js/config.js    (API URL konfiguration)
+- docs/js/cart-common.js (Delad cart-funktionalitet)
+- docs/js/products.js  (Produktlogik)
+- docs/js/index.js     (Startsida-logik)
+- docs/js/cart.js      (Varukorg-logik)
+- docs/js/admin.js     (Admin-panel-logik)
+- docs/css/           (Alla stilar)
+- docs/picture/       (Produktbilder)
+
+Cloudflare:
+- tunnel-config.yml    (Tunnel konfiguration)
+- cloudflared.exe      (Tunnel-klient)
+- .cloudflared/        (Credentials & certificates)
+
+?? NÄSTA UTVECKLINGSSTEG
+================================================================================
+1. Betalningsintegration (Stripe/Klarna)
+2. Email-notifikationer (nodemailer)
+3. Kundkonton med order-historik
+4. Produktrecensioner och betyg
+5. Filtrera produkter på flera attribut
+6. Bilduppladdning istället för bara välja befintliga
+7. Avancerad lagerhantering
+8. Google Analytics eller Plausible
+9. SEO-optimering (meta tags, sitemap)
+10. Automatisk backup av databas
+
+?? TIPS FÖR FRAMTIDEN
+================================================================================
+- Håll backend + tunnel körande för att siten ska fungera
+- Cloudflare Tunnel måste startas om efter dator-restart
+- Uppdatera PHONE_API IP om ditt nätverk ändras (194.47.40.60)
+- Bilder läggs i docs/picture/ och syns automatiskt i bildväljaren
+- Produkter sparas i moggesstore.db - backup den regelbundet!
+- config.js MODE styr vilken API-URL som används (production/phone/local)
+
+?? SÄKERHET
+================================================================================
+- SESSION_SECRET genereras automatiskt och sparas i .env
+- Lösenord hashas med bcrypt (salt rounds: 10)
+- Sessions är httpOnly, sameSite: 'lax'
+- CORS begränsad till kända origins
+- Admin-routes kräver authentication
+- .env och moggesstore.db finns i .gitignore
+
+?? CLOUDFLARE TUNNEL DETALJER
+================================================================================
+Tunnel ID:        848f9056-284e-4755-b3eb-00afaea705b3
+Tunnel Name:      mogges-backend
+DNS Record:       api.mogges-store.se ? CNAME till tunnel
+Protocol:         HTTP/2 (ej QUIC pga blockeringar)
+Credentials:      C:\Users\morga\.cloudflared\848f9056-284e-4755-b3eb-00afaea705b3.json
+Cert:             C:\Users\morga\.cloudflared\cert.pem
+
+Logga in på Cloudflare Tunnel:
+   .\cloudflared.exe tunnel login
+
+Lista tunnlar:
+   .\cloudflared.exe tunnel list
+
+Ta bort tunnel (om nödvändigt):
+   .\cloudflared.exe tunnel delete mogges-backend
+
+Skapa ny tunnel:
+   .\cloudflared.exe tunnel create tunnel-name
+   .\cloudflared.exe tunnel route dns tunnel-name subdomain.domain.com
+
+?? SUPPORT & LÄNKAR
+================================================================================
+Cloudflare Dashboard: https://dash.cloudflare.com
+Cloudflare Tunnel Docs: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/
+sql.js GitHub: https://github.com/sql-js/sql.js
+Express.js Docs: https://expressjs.com/
+
+?? STATUS: ? PRODUCTION READY
+================================================================================
+Sidan är live och fullt funktionell på https://mogges-store.se
+Backend exponeras säkert via HTTPS genom Cloudflare Tunnel
+Alla kärnfunktioner fungerar: Products, Cart, Admin CRUD
+Svenska språket fungerar perfekt
+Mobil + Desktop testat och fungerande
+
+================================================================================
+SENASTE ÄNDRINGAR (2026-02-03)
+================================================================================
+- Fixat svenska tecken (encoding UTF-8) i alla filer
+- Skapade cart-common.js för delad cart-funktionalitet
+- Exponerade addToCart, updateQuantity, removeFromCart globalt
+- Lagt till visuell bildväljare i admin med /api/images endpoint
+- Implementerade toast-notifikationer istället för alerts
+- Fixade syntax-fel i products.js (missing bracket)
+- Konfigurerade Cloudflare Tunnel med HTTP/2 protokoll
+- Bytte från localhost till 127.0.0.1 för IPv4-kompatibilitet
+- Satte MODE: 'production' i config.js
+- Allt committat och pushat till GitHub
+- Cloudflare Pages auto-deployer nya ändringar
+
+?? SLUTSATS
+================================================================================
+Projektet är produktionsklart och fungerar smärtfritt.
+Alla delar är på plats: Frontend, Backend, Databas, Tunnel, Admin.
+Dokumentation och kod är välorganiserad.
+Nästa session kan börja direkt utan omkonfiguration!
+
+Lycka till med fortsatt utveckling! ??
