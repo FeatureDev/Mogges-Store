@@ -135,7 +135,7 @@ if (confirmButton) {
         
         // Simulate payment processing
         setTimeout(() => {
-            alert('Betalning bekr�ftad! \n\nDin order har skickats. \nTack f�r ditt k�p!');
+            alert('Betalning bekräftad! \n\nDin order har skickats. \nTack för ditt köp!');
             
             // Clear cart
             localStorage.removeItem('cart');
