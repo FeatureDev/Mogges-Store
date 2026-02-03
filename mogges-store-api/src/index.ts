@@ -1,4 +1,7 @@
-﻿import { Hono } from 'hono';
+﻿// src/index.ts
+
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 
 type Bindings = {
 	DB: D1Database;
@@ -6,23 +9,39 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// API root (hälsokontroll)
+/**
+ * CORS middleware
+ * Allows frontend on mogges-store.se to access API
+ */
+app.use(
+	'/api/*',
+	cors({
+		origin: [
+			'https://www.mogges-store.se',
+			'https://mogges-store.se',
+			'http://localhost:8080',
+			'http://127.0.0.1:8080'
+		],
+		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowHeaders: ['Content-Type', 'Authorization'],
+		credentials: true
+	})
+);
+
+// API root
 app.get('/api', (c) => {
 	return c.text('Mogges Store API is running');
 });
 
 // Products
 app.get('/api/products', async (c) => {
-	try {
-		const { results } = await c.env.DB
-			.prepare('SELECT Id, Name, Description, Price, Category, Stock, Image FROM Products')
-			.all();
+	const { results } = await c.env.DB
+		.prepare(
+			'SELECT Id, Name, Description, Price, Category, Stock, Image FROM Products'
+		)
+		.all();
 
-		return c.json(results);
-	} catch (err) {
-		console.error('DATABASE ERROR:', err);
-		return c.json({ error: 'Database failure' }, 500);
-	}
+	return c.json(results);
 });
 
 export default app;
