@@ -361,3 +361,8 @@ Dokumentation och kod är välorganiserad.
 Nästa session kan börja direkt utan omkonfiguration!
 
 Lycka till med fortsatt utveckling! ??
+
+??databas i Cloudflare D1
+Database name: mogges-store-db
+Database ID:   0be175bf-ba6e-4194-844b-d53cdcbf77f1
+Binding name:  mogges_store_db

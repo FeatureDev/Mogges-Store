@@ -1,0 +1,46 @@
+﻿/** wrangler.jsonc
+ * Cloudflare Workers configuration for Mogges Store API
+ * Backend: Hono
+ * Database: Cloudflare D1 (mogges-store-db)
+ */
+
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+
+	// Worker name (used for deployment URL)
+	"name": "mogges-store-api",
+
+	// Entry point for the Worker
+	"main": "src/index.ts",
+
+	// Required compatibility date
+	"compatibility_date": "2026-01-31",
+
+	// Static assets (not required for API, but OK to keep)
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./public"
+	},
+
+	// Enable observability (logs, traces)
+	"observability": {
+		"enabled": true
+	},
+
+	// Cloudflare D1 database binding
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "mogges-store-db",
+			"database_id": "0be175bf-ba6e-4194-844b-d53cdcbf77f1"
+		}
+	]
+
+	// Optional: Smart placement (can be enabled later)
+	// "placement": { "mode": "smart" }
+
+	// Optional: Environment variables
+	// "vars": {
+	//   "NODE_ENV": "production"
+	// }
+}

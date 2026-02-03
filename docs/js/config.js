@@ -1,42 +1,23 @@
-﻿// API Configuration
-// Change this to your ngrok URL when exposing backend to internet
-export const CONFIG = {
-    // Local development (when running npm start on PC)
-    LOCAL_API: 'http://localhost:3000',
-    
-    // Phone backend on same WiFi (replace with your phone's IP address)
-    PHONE_API: 'http://194.47.40.60:3000',
-    
-    // Ngrok tunnel (replace with your ngrok URL)
-    // Example: https://abc123.ngrok-free.app
-    NGROK_API: 'https://mogges-store.se',
-    
-    // Production domain API
-    PRODUCTION_API: 'https://api.mogges-store.se',
-    
-    // Choose mode: 'local', 'phone', 'ngrok', or 'production'
-    MODE: 'production'
-};
+﻿// config.js
 
-// Get the active API URL based on mode
-function getApiUrl() {
-    switch(CONFIG.MODE) {
-        case 'phone':
-            return CONFIG.PHONE_API;
-        case 'ngrok':
-            return CONFIG.NGROK_API;
-        case 'production':
-            return CONFIG.PRODUCTION_API;
-        case 'local':
-        default:
-            return CONFIG.LOCAL_API;
-    }
+const MODE = 'production';
+// 'local' | 'production'
+
+let API_BASE_URL;
+
+switch (MODE) {
+    case 'local':
+        // Local dev (wrangler dev)
+        API_BASE_URL = 'http://localhost:8787';
+        break;
+
+    case 'production':
+        // Cloudflare Workers (LIVE)
+        API_BASE_URL = 'https://mogges-store-api.morganlindbom.workers.dev';
+        break;
+
+    default:
+        throw new Error(`Unknown MODE: ${MODE}`);
 }
 
-export const API_BASE_URL = getApiUrl();
-
-console.log('ö API Configuration:', {
-    mode: CONFIG.MODE.toUpperCase(),
-    url: API_BASE_URL
-});
-
+export { API_BASE_URL };
