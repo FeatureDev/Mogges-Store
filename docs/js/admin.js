@@ -1,6 +1,6 @@
-import { API_BASE_URL } from './config.js';
+ï»¿import { API_BASE_URL } from './config.js';
 
-console.log('????? Admin page loaded');
+console.log('â†’Ã¶ Admin page loaded');
 
 // Use API_BASE_URL from config.js
 const API_URL = API_BASE_URL;
@@ -100,23 +100,23 @@ function selectImage(imagePath) {
 // Predefined product names per category (professional Swedish names)
 const productNamesByCategory = {
     'Dam Mode': [
-        'Elegant Aftonklänning',
+        'Elegant Aftonklï¿½nning',
         'Klassisk Blus',
         'Modern Kavaj',
-        'Sommarklänning',
+        'Sommarklï¿½nning',
         'Vinterkappa',
         'Businesskjol',
-        'Stickad Tröja',
+        'Stickad Trï¿½ja',
         'Bomullsskjorta',
-        'Festklänning',
-        'Lång Cardigan'
+        'Festklï¿½nning',
+        'Lï¿½ng Cardigan'
     ],
     'Herr Mode': [
         'Kostymbyxa',
         'Businessskjorta',
         'Kavaj',
-        'Polotröja',
-        'Stickad Tröja',
+        'Polotrï¿½ja',
+        'Stickad Trï¿½ja',
         'Chinos',
         'Jeans',
         'Vinterjacka',
@@ -124,26 +124,26 @@ const productNamesByCategory = {
         'Skjorta Premium'
     ],
     'Accessoarer': [
-        'Läderväska',
-        'Plånbok',
-        'Bälte',
+        'Lï¿½dervï¿½ska',
+        'Plï¿½nbok',
+        'Bï¿½lte',
         'Halsduk',
-        'Mössa',
+        'Mï¿½ssa',
         'Handskar',
-        'Solglasögon',
+        'Solglasï¿½gon',
         'Armband',
         'Halsband',
-        'Örhängen'
+        'ï¿½rhï¿½ngen'
     ],
     'Skor': [
-        'Läderskor',
+        'Lï¿½derskor',
         'Sneakers',
-        'Stövlar',
+        'Stï¿½vlar',
         'Sandaletter',
         'Loafers',
         'Pumps',
         'Boots',
-        'Träningsskor',
+        'Trï¿½ningsskor',
         'Vardagsskor',
         'Festskor'
     ]
@@ -480,7 +480,7 @@ try {
             browseBtn.type = 'button';
             browseBtn.className = 'btn btn-secondary';
             browseBtn.id = 'browse-images-btn';
-            browseBtn.textContent = '?? Valj Bild';
+            browseBtn.textContent = 'Ã¶ Valj Bild';
             browseBtn.style.marginTop = '8px';
             
             imageInput.parentElement.insertBefore(browseBtn, imageInput.nextSibling);

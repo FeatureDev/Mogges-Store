@@ -11,15 +11,15 @@ let products = [];
 
 // ===== FEATURED PRODUCTS (Home Page) =====
 async function loadFeaturedProducts() {
-console.log('?? loadFeaturedProducts() called');
+console.log('ö loadFeaturedProducts() called');
 try {
-    console.log('?? Fetching from:', API_URL);
+    console.log('ö Fetching from:', API_URL);
     const response = await fetch(API_URL, {
         headers: {
             'ngrok-skip-browser-warning': 'true'
         }
     });
-    console.log('?? Response status:', response.status);
+    console.log('ö Response status:', response.status);
     if (!response.ok) throw new Error('Failed to fetch products');
         
         const productsData = await response.json();
@@ -35,7 +35,7 @@ try {
 }
 
 function displayFeaturedProducts(products) {
-    console.log('?? displayFeaturedProducts() called with', products.length, 'products');
+    console.log('ö displayFeaturedProducts() called with', products.length, 'products');
     const container = document.getElementById('featured-products');
     
     if (!container) {
@@ -68,7 +68,7 @@ function displayFeaturedProducts(products) {
         </div>
     `).join('');
     
-    console.log('?? HTML generated, length:', html.length);
+    console.log('ö HTML generated, length:', html.length);
     container.innerHTML = html;
     console.log('? Products displayed!');
 }
@@ -328,16 +328,16 @@ function displayError(containerId) {
 
 function getProductEmoji(category) {
     const emojiMap = {
-        'Electronics': '??',
-        'Clothing': '??',
-        'Books': '??',
-        'Food': '??',
-        'Toys': '??',
+        'Electronics': 'ö',
+        'Clothing': 'ö',
+        'Books': 'ö',
+        'Food': 'ö',
+        'Toys': 'ö',
         'Sports': '?',
-        'Home': '??',
-        'Garden': '??'
+        'Home': 'ö',
+        'Garden': 'ö'
     };
-    return emojiMap[category] || '??';
+    return emojiMap[category] || 'ö';
 }
 
 function getStockClass(stock) {

@@ -1,4 +1,4 @@
-// PWA install functionality
+﻿// PWA install functionality
 console.log('PWA install script loaded');
 
 // Clear all caches on load

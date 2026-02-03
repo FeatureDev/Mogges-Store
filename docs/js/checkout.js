@@ -1,6 +1,6 @@
-import { API_BASE_URL } from './config.js';
+﻿import { API_BASE_URL } from './config.js';
 
-console.log('?? Checkout page loaded');
+console.log('ö Checkout page loaded');
 
 const API_URL = `${API_BASE_URL}/api/products`;
 let products = [];
@@ -20,7 +20,7 @@ function updateCartCount() {
 // Load products from API
 async function loadProducts() {
     try {
-        console.log('?? Loading products from API...');
+        console.log('ö Loading products from API...');
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Failed to fetch products');
         
@@ -36,7 +36,7 @@ async function loadProducts() {
 // Load order items from cart
 async function loadOrderItems() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    console.log('?? Loading cart items:', cart);
+    console.log('ö Loading cart items:', cart);
     
     const orderItemsContainer = document.getElementById('order-items');
     
@@ -46,7 +46,7 @@ async function loadOrderItems() {
     }
     
     if (cart.length === 0) {
-        console.log('?? Cart is empty, redirecting to cart page');
+        console.log('ö Cart is empty, redirecting to cart page');
         window.location.href = 'cart.html';
         return;
     }
@@ -60,7 +60,7 @@ async function loadOrderItems() {
     const orderItems = cart.map(cartItem => {
         const product = products.find(p => p.id === cartItem.id);
         if (!product) {
-            console.warn('?? Product not found for cart item:', cartItem);
+            console.warn('ö Product not found for cart item:', cartItem);
             return null;
         }
         return {
@@ -97,7 +97,7 @@ function calculateTotals(orderItems) {
     const vat = subtotal - subtotalBeforeVat;
     const total = subtotal + shippingCost;
     
-    console.log('?? Calculations:', {
+    console.log('ö Calculations:', {
         subtotal: subtotal,
         shippingCost: shippingCost,
         vat: vat,
@@ -124,7 +124,7 @@ function calculateTotals(orderItems) {
 const confirmButton = document.getElementById('confirm-payment');
 if (confirmButton) {
     confirmButton.addEventListener('click', () => {
-        console.log('?? Payment confirmation clicked');
+        console.log('ö Payment confirmation clicked');
         
         // Show loading
         const qrLoader = document.getElementById('qr-loader');
@@ -135,7 +135,7 @@ if (confirmButton) {
         
         // Simulate payment processing
         setTimeout(() => {
-            alert('Betalning bekr�ftad! \n\nDin order har skickats. \nTack f�r ditt k�p!');
+            alert('Betalning bekr�ftad! \n\nDin order har skickats. \nTack f�r ditt k�p!');
             
             // Clear cart
             localStorage.removeItem('cart');
@@ -150,7 +150,7 @@ if (confirmButton) {
 }
 
 // Initialize
-console.log('?? Initializing checkout...');
+console.log('ö Initializing checkout...');
 updateCartCount();
 loadOrderItems();
 

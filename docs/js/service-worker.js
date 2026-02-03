@@ -1,4 +1,4 @@
-// Service Worker - Cache static assets, always fetch API fresh
+﻿// Service Worker - Cache static assets, always fetch API fresh
 const CACHE_NAME = 'mogges-store-v1';
 
 // Assets to cache (only static files)

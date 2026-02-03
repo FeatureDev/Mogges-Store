@@ -1,6 +1,6 @@
-import { API_BASE_URL } from './config.js';
+﻿import { API_BASE_URL } from './config.js';
 
-console.log('?? Login page loaded');
+console.log('ö Login page loaded');
 
 // Use API_BASE_URL from config.js
 const API_URL = API_BASE_URL;
@@ -70,7 +70,7 @@ loginForm.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error('? Network error:', error);
         errorMessage.style.display = 'block';
-        errorMessage.textContent = '? N�got gick fel. Forsok igen.';
+        errorMessage.textContent = '? N�got gick fel. Forsok igen.';
         
         // Re-enable button
         loginButton.disabled = false;
