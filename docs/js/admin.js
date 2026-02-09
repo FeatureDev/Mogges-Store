@@ -466,7 +466,7 @@ document.getElementById('product-modal').addEventListener('click', (e) => {
 document.getElementById('logout-btn').addEventListener('click', async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login.html';
+    window.location.href = '/produkts.html';
 });
 
 // Initialize
