@@ -31,7 +31,6 @@ loginForm.addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
         
@@ -39,6 +38,10 @@ loginForm.addEventListener('submit', async (e) => {
         
         if (response.ok) {
             console.log('? Login successful:', data);
+            
+            // Save JWT token
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
             
             // Show success message
             errorMessage.style.display = 'block';

@@ -42,10 +42,12 @@ function createImagePickerModal() {
 
 // Load available images
 async function loadImages() {
-    try {
-        const response = await fetch(`${API_URL}/api/images`, {
-            credentials: 'include'
-        });
+try {
+    const response = await fetch(`${API_URL}/api/images`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
         availableImages = await response.json();
         return availableImages;
     } catch (error) {
@@ -173,12 +175,22 @@ document.getElementById('product-category').addEventListener('change', (e) => {
 // Check authentication
 async function checkAuth() {
 try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return false;
+    }
+
     const response = await fetch(`${API_URL}/api/check-auth`, {
-        credentials: 'include'
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
     const data = await response.json();
         
         if (!data.authenticated || data.user.role !== 'admin') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             window.location.href = '/login.html';
             return false;
         }
@@ -194,10 +206,12 @@ try {
 
 // Load products
 async function loadProducts() {
-    try {
-        const response = await fetch(`${API_URL}/api/products`, {
-            credentials: 'include'
-        });
+try {
+    const response = await fetch(`${API_URL}/api/products`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
         if (!response.ok) throw new Error('Failed to fetch products');
         
         products = await response.json();
@@ -320,7 +334,9 @@ window.deleteProduct = async function(id) {
     try {
         const response = await fetch(`${API_URL}/api/products/${id}`, {
             method: 'DELETE',
-            credentials: 'include'
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
         });
         
         const data = await response.json();
@@ -377,9 +393,9 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
         const response = await fetch(url, {
             method,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            credentials: 'include',
             body: JSON.stringify(formData)
         });
         
@@ -448,17 +464,9 @@ document.getElementById('product-modal').addEventListener('click', (e) => {
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', async () => {
-try {
-    const response = await fetch(`${API_URL}/api/logout`, { 
-        method: 'POST',
-        credentials: 'include'
-    });
-        if (response.ok) {
-            window.location.href = '/login.html';
-        }
-    } catch (error) {
-        console.error('Logout failed:', error);
-    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login.html';
 });
 
 // Initialize
