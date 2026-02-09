@@ -42,12 +42,17 @@ function createImagePickerModal() {
 
 // Load available images
 async function loadImages() {
-try {
-    const response = await fetch(`${API_URL}/api/images`, {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/images`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            console.warn('Images endpoint not available:', response.status);
+            return [];
         }
-    });
         availableImages = await response.json();
         return availableImages;
     } catch (error) {
@@ -174,27 +179,27 @@ document.getElementById('product-category').addEventListener('change', (e) => {
 
 // Check authentication
 async function checkAuth() {
-try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login.html';
-        return false;
-    }
-
-    const response = await fetch(`${API_URL}/api/check-auth`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+            return false;
         }
-    });
-    const data = await response.json();
-        
+
+        const response = await fetch(`${API_URL}/api/check-auth`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+
         if (!data.authenticated || data.user.role !== 'admin') {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login.html';
             return false;
         }
-        
+
         document.getElementById('user-email').textContent = data.user.email;
         return true;
     } catch (error) {
@@ -206,14 +211,15 @@ try {
 
 // Load products
 async function loadProducts() {
-try {
-    const response = await fetch(`${API_URL}/api/products`, {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/products`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch products');
-        
+
         products = await response.json();
         displayProducts();
     } catch (error) {
