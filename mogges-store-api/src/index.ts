@@ -195,6 +195,46 @@ app.post('/api/login', async (c) => {
 	}
 });
 
+// ==========================================
+// REGISTER (public)
+// ==========================================
+
+app.post('/api/register', async (c) => {
+	const body = await c.req.json();
+	const { email, password } = body;
+
+	if (!email || !password) {
+		return c.json({ error: 'Email and password required' }, 400);
+	}
+
+	try {
+		// Check if email already exists
+		const existing = await c.env.DB
+			.prepare('SELECT Id FROM Users WHERE Email = ?')
+			.bind(email)
+			.first();
+
+		if (existing) {
+			return c.json({ error: 'Email already in use' }, 409);
+		}
+
+		// Hash password
+		const hashedPassword = await hashPassword(password);
+
+		// Insert new customer (default role = customer)
+		await c.env.DB
+			.prepare('INSERT INTO Users (Email, Password, Role) VALUES (?, ?, ?)')
+			.bind(email, hashedPassword, 'customer')
+			.run();
+
+		return c.json({ message: 'Account created successfully' }, 201);
+	} catch (err) {
+		console.error('Register error:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+
 app.get('/api/check-auth', async (c) => {
 	const user = await getAuthUser(c);
 	if (user) {
@@ -280,5 +320,43 @@ app.delete('/api/products/:id', async (c) => {
 		return c.json({ error: 'Failed to delete product' }, 500);
 	}
 });
+
+// Admin: Create user with any role
+app.post('/api/admin/create-user', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || user.role !== 'admin') {
+		return c.json({ error: 'Forbidden - Admin access required' }, 403);
+	}
+
+	const { email, password, role } = await c.req.json();
+
+	if (!email || !password || !role) {
+		return c.json({ error: 'Email, password and role required' }, 400);
+	}
+
+	try {
+		const existingUser = await c.env.DB
+			.prepare('SELECT Id FROM Users WHERE Email = ?')
+			.bind(email)
+			.first();
+
+		if (existingUser) {
+			return c.json({ error: 'Email already exists' }, 409);
+		}
+
+		const hashedPassword = await hashPassword(password);
+
+		await c.env.DB
+			.prepare('INSERT INTO Users (Email, Password, Role) VALUES (?, ?, ?)')
+			.bind(email, hashedPassword, role)
+			.run();
+
+		return c.json({ message: 'User created successfully' }, 201);
+	} catch (err) {
+		console.error('Admin create user error:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
 
 export default app;
