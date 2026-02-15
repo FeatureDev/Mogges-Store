@@ -1,6 +1,6 @@
 ﻿import { API_BASE_URL } from './config.js';
 
-console.log('→ö Admin page loaded');
+console.log('Admin dashboard loaded');
 
 // Use API_BASE_URL from config.js
 const API_URL = API_BASE_URL;
@@ -8,6 +8,84 @@ const API_URL = API_BASE_URL;
 let products = [];
 let editingProductId = null;
 let availableImages = [];
+
+// ==========================================
+// SIDEBAR NAVIGATION
+// ==========================================
+
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetPage = item.dataset.page;
+
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+
+            pages.forEach(p => p.classList.add('hidden'));
+            const page = document.getElementById('page-' + targetPage);
+            if (page) page.classList.remove('hidden');
+
+            if (targetPage === 'products') loadProducts();
+            if (targetPage === 'dashboard') loadDashboardStats();
+            if (targetPage === 'users') loadUsers();
+        });
+    });
+}
+
+// ==========================================
+// DASHBOARD STATS
+// ==========================================
+
+async function loadDashboardStats() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(API_URL + '/api/products', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const productsData = await response.json();
+
+        const totalRevenue = productsData.reduce((sum, p) => sum + (p.price * p.stock), 0);
+        document.getElementById('stat-users').textContent = '—';
+        document.getElementById('stat-employees').textContent = '—';
+        document.getElementById('stat-revenue').textContent = Math.round(totalRevenue).toLocaleString('sv-SE') + ' kr';
+        document.getElementById('stat-active').textContent = productsData.length;
+
+        document.getElementById('activity-list').innerHTML =
+            '<li>Dashboard laddad</li>' +
+            '<li>' + productsData.length + ' produkter i databasen</li>' +
+            '<li>API: ' + API_URL + '</li>';
+    } catch (error) {
+        console.error('Dashboard stats error:', error);
+    }
+}
+
+// ==========================================
+// USERS PAGE
+// ==========================================
+
+async function loadUsers() {
+    const container = document.getElementById('users-content');
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(API_URL + '/api/users', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) {
+            container.innerHTML = '<div class="loading">Users endpoint not available yet</div>';
+            return;
+        }
+        const users = await response.json();
+        container.innerHTML = '<ul>' + users.map(u =>
+            '<li>' + u.email + ' (' + u.role + ')</li>'
+        ).join('') + '</ul>';
+    } catch (error) {
+        container.innerHTML = '<div class="loading">Kunde inte ladda users</div>';
+    }
+}
 
 // Create image picker modal dynamically
 function createImagePickerModal() {
@@ -481,35 +559,34 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 (async () => {
     const isAuth = await checkAuth();
     if (isAuth) {
+        setupNavigation();
+        loadDashboardStats();
         loadProducts();
         await loadImages();
         createImagePickerModal();
-        
+
         // Setup browse images button
         const productModal = document.getElementById('product-modal');
         if (!document.getElementById('browse-images-btn')) {
-            // Create button dynamically if not in HTML
             const imageInput = document.getElementById('product-image');
             imageInput.readOnly = true;
-            
+
             const browseBtn = document.createElement('button');
             browseBtn.type = 'button';
             browseBtn.className = 'btn btn-secondary';
             browseBtn.id = 'browse-images-btn';
-            browseBtn.textContent = 'ö Valj Bild';
+            browseBtn.textContent = 'Valj Bild';
             browseBtn.style.marginTop = '8px';
-            
+
             imageInput.parentElement.insertBefore(browseBtn, imageInput.nextSibling);
-            
-            // Add preview container
+
             const previewDiv = document.createElement('div');
             previewDiv.id = 'current-image-preview';
             previewDiv.style.cssText = 'margin-top: 10px; display: none;';
             previewDiv.innerHTML = '<img id="current-image" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border: 2px solid #e5e7eb; border-radius: 8px;">';
             browseBtn.parentElement.appendChild(previewDiv);
         }
-        
-        // Browse images button click
+
         document.getElementById('browse-images-btn').addEventListener('click', async () => {
             await loadImages();
             displayImageGallery();
@@ -518,4 +595,4 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     }
 })();
 
-console.log('? Admin page initialized');
+console.log('Admin dashboard initialized');

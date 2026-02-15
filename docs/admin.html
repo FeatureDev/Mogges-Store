@@ -3,39 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Admin Panel - Mogges Store">
+    <meta name="description" content="Admin Dashboard - Mogges Store">
     <meta name="theme-color" content="#6366f1">
-    <title>Admin Panel - Mogges Store</title>
+    <title>Admin Dashboard - Mogges Store</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-    <div class="admin-container">
-        <header class="admin-header">
-            <div class="admin-header-left">
-                <h1>→📷 Admin Panel</h1>
-                <span class="user-info">Inloggad som: <span id="user-email">-</span></span>
-            </div>
-            <div class="admin-header-right">
-                <button class="btn btn-primary" id="add-product-btn">+ L�gg till produkt</button>
-                <button class="btn btn-secondary" id="logout-btn">Logga ut</button>
-            </div>
-        </header>
+    <div class="admin-layout">
 
-        <main class="admin-main">
-            <div class="products-section">
-                <h2>Alla produkter</h2>
-                <div id="products-grid" class="products-grid">
-                    <div class="loading">Laddar produkter...</div>
-                </div>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="8" fill="#6366f1"/>
+                    <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <span class="sidebar-logo-text">MOGGES STORE</span>
             </div>
-        </main>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">&#128202;</span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#users" class="nav-item" data-page="users">
+                    <span class="nav-icon">&#128101;</span>
+                    <span class="nav-label">Users</span>
+                </a>
+                <a href="#employees" class="nav-item" data-page="employees">
+                    <span class="nav-icon">&#128188;</span>
+                    <span class="nav-label">Employees</span>
+                </a>
+                <a href="#orders" class="nav-item" data-page="orders">
+                    <span class="nav-icon">&#128230;</span>
+                    <span class="nav-label">Orders</span>
+                </a>
+                <a href="#products" class="nav-item" data-page="products">
+                    <span class="nav-icon">&#128722;</span>
+                    <span class="nav-label">Products</span>
+                </a>
+                <a href="#system" class="nav-item" data-page="system">
+                    <span class="nav-icon">&#9881;</span>
+                    <span class="nav-label">System</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main wrapper -->
+        <div class="main-wrapper">
+
+            <!-- Top header -->
+            <header class="top-header">
+                <div class="header-search">
+                    <input type="text" class="search-input" id="global-search" placeholder="Sok...">
+                </div>
+                <div class="header-user">
+                    <span class="header-user-icon">&#128100;</span>
+                    <span class="header-user-name" id="user-email">Admin</span>
+                    <button class="btn btn-secondary btn-small" id="logout-btn">Logga ut</button>
+                </div>
+            </header>
+
+            <!-- Main content area -->
+            <main class="main-content">
+
+                <!-- PAGE: Dashboard -->
+                <section class="page" id="page-dashboard">
+                    <h1 class="page-title">Dashboard</h1>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">&#128101;</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-users">0</span>
+                                <span class="stat-label">Total Users</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">&#128188;</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-employees">0</span>
+                                <span class="stat-label">Total Employees</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">&#128176;</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-revenue">0 kr</span>
+                                <span class="stat-label">Total Revenue</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">&#9989;</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-active">0</span>
+                                <span class="stat-label">Active Employees</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <section class="recent-activity">
+                        <h2>Recent Activity</h2>
+                        <div class="activity-box">
+                            <ul class="activity-list" id="activity-list">
+                                <li>Loading...</li>
+                            </ul>
+                        </div>
+                    </section>
+                </section>
+
+                <!-- PAGE: Users -->
+                <section class="page hidden" id="page-users">
+                    <h1 class="page-title">Users</h1>
+                    <div id="users-content">
+                        <div class="loading">Laddar anv&auml;ndare...</div>
+                    </div>
+                </section>
+
+                <!-- PAGE: Employees -->
+                <section class="page hidden" id="page-employees">
+                    <h1 class="page-title">Employees</h1>
+                    <div id="employees-content">
+                        <div class="loading">Laddar anst&auml;llda...</div>
+                    </div>
+                </section>
+
+                <!-- PAGE: Orders -->
+                <section class="page hidden" id="page-orders">
+                    <h1 class="page-title">Orders</h1>
+                    <div id="orders-content">
+                        <div class="loading">Laddar ordrar...</div>
+                    </div>
+                </section>
+
+                <!-- PAGE: Products -->
+                <section class="page hidden" id="page-products">
+                    <div class="page-header">
+                        <h1 class="page-title">Products</h1>
+                        <button class="btn btn-primary" id="add-product-btn">+ L&auml;gg till produkt</button>
+                    </div>
+                    <div id="products-grid" class="products-grid">
+                        <div class="loading">Laddar produkter...</div>
+                    </div>
+                </section>
+
+                <!-- PAGE: System -->
+                <section class="page hidden" id="page-system">
+                    <h1 class="page-title">System</h1>
+                    <div id="system-content">
+                        <div class="loading">Laddar systeminformation...</div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
     </div>
 
     <!-- Product Modal -->
     <div id="product-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">L�gg till produkt</h2>
+                <h2 id="modal-title">L&auml;gg till produkt</h2>
                 <span class="close" id="close-modal">&times;</span>
             </div>
             <form id="product-form" class="product-form">
@@ -44,7 +173,7 @@
                 <div class="form-group">
                     <label for="product-category">Kategori *</label>
                     <select id="product-category" required>
-                        <option value="">V�lj kategori...</option>
+                        <option value="">V&auml;lj kategori...</option>
                         <option value="Dam Mode">Dam Mode</option>
                         <option value="Herr Mode">Herr Mode</option>
                         <option value="Accessoarer">Accessoarer</option>
@@ -55,7 +184,7 @@
                 <div class="form-group">
                     <label for="product-name">Produktnamn *</label>
                     <select id="product-name" disabled required>
-                        <option value="">V�lj kategori f�rst...</option>
+                        <option value="">V&auml;lj kategori f&ouml;rst...</option>
                     </select>
                 </div>
 
@@ -89,8 +218,8 @@
         </div>
     </div>
 
-    <script type="module" src="js/config.js?v=2"></script>
-    <script type="module" src="js/cart-common.js?v=2"></script>
-    <script type="module" src="js/admin.js?v=2"></script>
+    <script type="module" src="js/config.js?v=3"></script>
+    <script type="module" src="js/cart-common.js?v=3"></script>
+    <script type="module" src="js/admin.js?v=3"></script>
 </body>
 </html>
