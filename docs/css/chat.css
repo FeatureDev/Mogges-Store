@@ -290,18 +290,18 @@
 /* Quick actions */
 .chat-quick-actions {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
-    padding: 0 16px 8px;
+    padding: 0 12px 6px;
     background: #f8f9fb;
 }
 
 .chat-quick-btn {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
+    border-radius: 14px;
+    padding: 3px 10px;
+    font-size: 11px;
     color: #6366f1;
     cursor: pointer;
     transition: all 0.2s;

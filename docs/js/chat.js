@@ -97,7 +97,6 @@ import { API_BASE_URL } from './config.js';
     if (chatHistory.length > 0) {
         // Clear default greeting
         messagesEl.innerHTML = '';
-        quickActions.style.display = 'none';
 
         for (var i = 0; i < chatHistory.length; i++) {
             var h = chatHistory[i];
@@ -123,9 +122,6 @@ import { API_BASE_URL } from './config.js';
     // Send message
     function sendMessage(text) {
         if (!text.trim()) return;
-
-        // Hide quick actions after first message
-        quickActions.style.display = 'none';
 
         // Add user message
         addMessage(text, 'user');
@@ -222,6 +218,5 @@ import { API_BASE_URL } from './config.js';
         sessionStorage.removeItem(STORAGE_KEY);
         messagesEl.innerHTML =
             '<div class="chat-msg bot">Hej d\u00E4r! \uD83D\uDC4B Jag \u00E4r Mogge, din personliga shoppingassistent. Vad kan jag hj\u00E4lpa dig med idag? \uD83D\uDC9C</div>';
-        quickActions.style.display = 'flex';
     });
 })();
