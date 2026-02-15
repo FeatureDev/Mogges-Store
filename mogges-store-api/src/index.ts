@@ -241,10 +241,10 @@ app.post('/api/register', async (c) => {
 		// Hash password
 		const hashedPassword = await hashPassword(password);
 
-		// Insert new customer (default role = customer)
+		// Insert new customer (default role = user)
 		await c.env.DB
 			.prepare('INSERT INTO Users (Email, Password, Role) VALUES (?, ?, ?)')
-			.bind(email, hashedPassword, 'customer')
+			.bind(email, hashedPassword, 'user')
 			.run();
 
 		return c.json({ message: 'Account created successfully' }, 201);

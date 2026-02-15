@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config.js";
+﻿import { API_BASE_URL } from "./config.js";
 
 // Wait until the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("Register attempt:", { name, email, password });
+        console.log("Register attempt:", { email });
 
         // Connect to backend API here
 
@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name,
                     email,
                     password
                 })
@@ -43,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Registration failed");
+                throw new Error(data.error || "Registration failed");
             }
 
             // Success
