@@ -650,3 +650,69 @@ form {
     }
 }
 
+/* ==========================================
+   USERS TABLE
+   ========================================== */
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.users-table thead {
+    background: var(--bg-light);
+}
+
+.users-table th,
+.users-table td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.875rem;
+}
+
+.users-table th {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.role-select {
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-master {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.role-admin {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-employee {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.role-user {
+    background: #f3f4f6;
+    color: #374151;
+}
+

@@ -100,6 +100,23 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
 }
 
 // ==========================================
+// ROLE HELPERS
+// ==========================================
+
+const ROLE_LEVELS: Record<string, number> = {
+	'master': 1,
+	'admin': 2,
+	'employee': 3,
+	'user': 4
+};
+
+function hasRole(userRole: string, requiredRole: string): boolean {
+	const userLevel = ROLE_LEVELS[userRole] || 99;
+	const requiredLevel = ROLE_LEVELS[requiredRole] || 0;
+	return userLevel <= requiredLevel;
+}
+
+// ==========================================
 // AUTH HELPER
 // ==========================================
 
@@ -240,7 +257,13 @@ app.get('/api/check-auth', async (c) => {
 	if (user) {
 		return c.json({
 			authenticated: true,
-			user: { email: user.email, role: user.role }
+			user: { email: user.email, role: user.role },
+			permissions: {
+				canAccessAdmin: hasRole(user.role, 'employee'),
+				canManageProducts: hasRole(user.role, 'admin'),
+				canManageUsers: hasRole(user.role, 'admin'),
+				canManageSystem: hasRole(user.role, 'master')
+			}
 		});
 	}
 	return c.json({ authenticated: false });
@@ -251,12 +274,83 @@ app.post('/api/logout', (c) => {
 });
 
 // ==========================================
+// USERS ROUTES (admin+)
+// ==========================================
+
+app.get('/api/users', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'admin')) {
+		return c.json({ error: 'Forbidden' }, 403);
+	}
+
+	try {
+		const { results } = await c.env.DB
+			.prepare('SELECT Id as id, Email as email, Role as role FROM Users')
+			.all();
+		return c.json(results);
+	} catch (err) {
+		console.error('Error fetching users:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.put('/api/admin/update-role', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'master')) {
+		return c.json({ error: 'Forbidden - Master admin required' }, 403);
+	}
+
+	const { userId, newRole } = await c.req.json();
+
+	if (!userId || !newRole || !ROLE_LEVELS[newRole]) {
+		return c.json({ error: 'Valid userId and role required' }, 400);
+	}
+
+	try {
+		await c.env.DB
+			.prepare('UPDATE Users SET Role = ? WHERE Id = ?')
+			.bind(newRole, userId)
+			.run();
+
+		return c.json({ message: 'Role updated' });
+	} catch (err) {
+		console.error('Error updating role:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.delete('/api/admin/delete-user/:id', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'master')) {
+		return c.json({ error: 'Forbidden - Master admin required' }, 403);
+	}
+
+	const id = c.req.param('id');
+
+	if (Number(id) === user.sub) {
+		return c.json({ error: 'Cannot delete yourself' }, 400);
+	}
+
+	try {
+		await c.env.DB
+			.prepare('DELETE FROM Users WHERE Id = ?')
+			.bind(id)
+			.run();
+
+		return c.json({ message: 'User deleted' });
+	} catch (err) {
+		console.error('Error deleting user:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+// ==========================================
 // ADMIN ROUTES (protected)
 // ==========================================
 
 app.post('/api/products', async (c) => {
 	const user = await getAuthUser(c);
-	if (!user || user.role !== 'admin') {
+	if (!user || !hasRole(user.role, 'admin')) {
 		return c.json({ error: 'Forbidden - Admin access required' }, 403);
 	}
 
@@ -280,7 +374,7 @@ app.post('/api/products', async (c) => {
 
 app.put('/api/products/:id', async (c) => {
 	const user = await getAuthUser(c);
-	if (!user || user.role !== 'admin') {
+	if (!user || !hasRole(user.role, 'admin')) {
 		return c.json({ error: 'Forbidden - Admin access required' }, 403);
 	}
 
@@ -302,7 +396,7 @@ app.put('/api/products/:id', async (c) => {
 
 app.delete('/api/products/:id', async (c) => {
 	const user = await getAuthUser(c);
-	if (!user || user.role !== 'admin') {
+	if (!user || !hasRole(user.role, 'admin')) {
 		return c.json({ error: 'Forbidden - Admin access required' }, 403);
 	}
 
@@ -324,7 +418,7 @@ app.delete('/api/products/:id', async (c) => {
 // Admin: Create user with any role
 app.post('/api/admin/create-user', async (c) => {
 	const user = await getAuthUser(c);
-	if (!user || user.role !== 'admin') {
+	if (!user || !hasRole(user.role, 'admin')) {
 		return c.json({ error: 'Forbidden - Admin access required' }, 403);
 	}
 
@@ -332,6 +426,18 @@ app.post('/api/admin/create-user', async (c) => {
 
 	if (!email || !password || !role) {
 		return c.json({ error: 'Email, password and role required' }, 400);
+	}
+
+	if (!ROLE_LEVELS[role]) {
+		return c.json({ error: 'Invalid role. Valid roles: master, admin, employee, user' }, 400);
+	}
+
+	if (role === 'master' && user.role !== 'master') {
+		return c.json({ error: 'Only master admins can create master accounts' }, 403);
+	}
+
+	if (role === 'admin' && !hasRole(user.role, 'master')) {
+		return c.json({ error: 'Only master admins can create admin accounts' }, 403);
 	}
 
 	try {

@@ -75,13 +75,78 @@ async function loadUsers() {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         if (!response.ok) {
-            container.innerHTML = '<div class="loading">Users endpoint not available yet</div>';
+            container.innerHTML = '<div class="loading">Users endpoint not available</div>';
             return;
         }
         const users = await response.json();
-        container.innerHTML = '<ul>' + users.map(u =>
-            '<li>' + u.email + ' (' + u.role + ')</li>'
-        ).join('') + '</ul>';
+        const isMaster = currentUserRole === 'master';
+        const roleOptions = ['master', 'admin', 'employee', 'user'];
+
+        let html = '<table class="users-table"><thead><tr>';
+        html += '<th>ID</th><th>Email</th><th>Roll</th>';
+        if (isMaster) html += '<th>Actions</th>';
+        html += '</tr></thead><tbody>';
+
+        users.forEach(function(u) {
+            html += '<tr>';
+            html += '<td>' + u.id + '</td>';
+            html += '<td>' + u.email + '</td>';
+            if (isMaster) {
+                html += '<td><select class="role-select" data-user-id="' + u.id + '">';
+                roleOptions.forEach(function(r) {
+                    var selected = r === u.role ? ' selected' : '';
+                    html += '<option value="' + r + '"' + selected + '>' + r + '</option>';
+                });
+                html += '</select></td>';
+                html += '<td><button class="btn btn-danger btn-small delete-user-btn" data-user-id="' + u.id + '">Ta bort</button></td>';
+            } else {
+                html += '<td><span class="role-badge role-' + u.role + '">' + u.role + '</span></td>';
+            }
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        if (isMaster) {
+            container.querySelectorAll('.role-select').forEach(function(sel) {
+                sel.addEventListener('change', async function() {
+                    var userId = this.dataset.userId;
+                    var newRole = this.value;
+                    var t = localStorage.getItem('token');
+                    var resp = await fetch(API_URL + '/api/admin/update-role', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t },
+                        body: JSON.stringify({ userId: Number(userId), newRole: newRole })
+                    });
+                    if (resp.ok) {
+                        var msg = document.createElement('div');
+                        msg.className = 'success-toast';
+                        msg.textContent = 'Roll uppdaterad!';
+                        document.body.appendChild(msg);
+                        setTimeout(function() { msg.remove(); }, 2000);
+                    } else {
+                        var err = await resp.json();
+                        alert(err.error || 'Kunde inte uppdatera roll');
+                        loadUsers();
+                    }
+                });
+            });
+
+            container.querySelectorAll('.delete-user-btn').forEach(function(btn) {
+                btn.addEventListener('click', async function() {
+                    var userId = this.dataset.userId;
+                    if (!confirm('Ta bort denna user?')) return;
+                    var t = localStorage.getItem('token');
+                    var resp = await fetch(API_URL + '/api/admin/delete-user/' + userId, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + t }
+                    });
+                    if (resp.ok) loadUsers();
+                    else alert('Kunde inte ta bort user');
+                });
+            });
+        }
     } catch (error) {
         container.innerHTML = '<div class="loading">Kunde inte ladda users</div>';
     }
@@ -255,6 +320,42 @@ document.getElementById('product-category').addEventListener('change', (e) => {
     updateProductNameOptions(e.target.value);
 });
 
+// ==========================================
+// ROLE PERMISSIONS
+// ==========================================
+
+const ROLE_LEVELS = { 'master': 1, 'admin': 2, 'employee': 3, 'user': 4 };
+let currentUserRole = 'user';
+let currentPermissions = {};
+
+function hasRole(role, required) {
+    return (ROLE_LEVELS[role] || 99) <= (ROLE_LEVELS[required] || 0);
+}
+
+function applyRolePermissions() {
+    const canManageProducts = hasRole(currentUserRole, 'admin');
+    const canManageUsers = hasRole(currentUserRole, 'admin');
+    const canManageSystem = hasRole(currentUserRole, 'master');
+
+    const addBtn = document.getElementById('add-product-btn');
+    if (addBtn) addBtn.style.display = canManageProducts ? '' : 'none';
+
+    const navUsers = document.querySelector('[data-page="users"]');
+    if (navUsers) navUsers.style.display = canManageUsers ? '' : 'none';
+
+    const navEmployees = document.querySelector('[data-page="employees"]');
+    if (navEmployees) navEmployees.style.display = canManageUsers ? '' : 'none';
+
+    const navSystem = document.querySelector('[data-page="system"]');
+    if (navSystem) navSystem.style.display = canManageSystem ? '' : 'none';
+
+    document.querySelectorAll('.btn-danger, .btn-secondary').forEach(btn => {
+        if (btn.textContent.includes('Ta bort') || btn.textContent.includes('Redigera')) {
+            btn.style.display = canManageProducts ? '' : 'none';
+        }
+    });
+}
+
 // Check authentication
 async function checkAuth() {
     try {
@@ -264,21 +365,24 @@ async function checkAuth() {
             return false;
         }
 
-        const response = await fetch(`${API_URL}/api/check-auth`, {
+        const response = await fetch(API_URL + '/api/check-auth', {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': 'Bearer ' + token
             }
         });
         const data = await response.json();
 
-        if (!data.authenticated || data.user.role !== 'admin') {
+        const allowedRoles = ['master', 'admin', 'employee'];
+        if (!data.authenticated || !allowedRoles.includes(data.user.role)) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login.html';
             return false;
         }
 
-        document.getElementById('user-email').textContent = data.user.email;
+        currentUserRole = data.user.role;
+        currentPermissions = data.permissions || {};
+        document.getElementById('user-email').textContent = data.user.email + ' (' + data.user.role + ')';
         return true;
     } catch (error) {
         console.error('Auth check failed:', error);
@@ -560,6 +664,7 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     const isAuth = await checkAuth();
     if (isAuth) {
         setupNavigation();
+        applyRolePermissions();
         loadDashboardStats();
         loadProducts();
         await loadImages();
