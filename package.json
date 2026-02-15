@@ -1,31 +1,21 @@
-{
-  "name": "github-pages-project",
-  "version": "1.0.0",
-  "description": "En statisk webbsida för GitHub Pages",
+﻿{
+  "name": "mogges-store",
+  "version": "2.0.0",
+  "description": "Mogges Store - Serverless e-handel med Cloudflare Workers",
   "type": "module",
-  "main": "Server.js",
   "scripts": {
-    "start": "node Server.js",
-    "preview": "node preview-server.js",
-    "init-db": "node init-db.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "cd mogges-store-api && npx wrangler deploy"
   },
   "keywords": [
-    "github-pages",
-    "static-site"
+    "cloudflare-pages",
+    "cloudflare-workers",
+    "serverless",
+    "e-commerce"
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "dotenv": "^17.2.3",
-    "express": "^4.18.2",
-    "express-session": "^1.19.0",
-    "hono": "^4.11.7",
-    "sql.js": "^1.11.0"
-  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",

@@ -87,24 +87,18 @@ npx wrangler d1 list
 npx wrangler d1 execute mogges-store-db --remote --command "SELECT * FROM Products"
 
 # Importera schema
-npx wrangler d1 execute mogges-store-db --remote --file=../schema.sql
+npx wrangler d1 execute mogges-store-db --remote --file=../config/schema.sql
 ```
 
 ---
 
 ## 🎯 NÄSTA STEG
 
-1. **Migrera Admin till Workers:**
-   - POST /api/products
-   - PUT /api/products/:id  
-   - DELETE /api/products/:id
-   - Auth middleware
-
-2. **Bilduppladdning:**
+1. **Bilduppladdning:**
    - Cloudflare R2 för storage
    - POST /api/images endpoint
 
-3. **Betalningar:**
+2. **Betalningar:**
    - Stripe/Klarna integration
    - Webhook-hantering
 
@@ -112,19 +106,12 @@ npx wrangler d1 execute mogges-store-db --remote --file=../schema.sql
 
 ## 🔧 VIKTIGA FILER
 
-### Aktiva (Används)
 - `docs/js/config.js` - API URL (MODE: 'production')
 - `mogges-store-api/src/index.ts` - Hono Worker
 - `mogges-store-api/wrangler.jsonc` - Worker config
-- `schema.sql` - D1 databas-schema
-- `products.sql` - D1 produktdata
-
-### Legacy (Ej längre används)
-- `Server.js` - Gammal Express server
-- `database.js` - SQLite wrapper
-- `moggesstore.db` - Lokal databas
-- `cloudflared.exe` - Tunnel-klient
-- `tunnel-config.yml` - Tunnel config
+- `config/schema.sql` - D1 databas-schema
+- `config/products.sql` - D1 produktdata
+- `config/.env.example` - Miljövariabler
 
 ---
 
