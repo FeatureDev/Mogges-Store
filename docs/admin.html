@@ -9,19 +9,55 @@
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
+    <!-- Same header as all pages -->
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="8" fill="#6366f1"/>
+                        <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                    </svg>
+                    <span class="logo-text">Mogges Store</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Hem</a></li>
+                    <li><a href="products.html">Produkter</a></li>
+                    <li><a href="about.html">Om Oss</a></li>
+                    <li><a href="admin.html" class="active">Admin</a></li>
+                    <li>
+                        <a href="login.html" class="login-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Logga in
+                        </a>
+                    </li>
+                    <li>
+                        <a href="cart.html" class="cart-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                            <span class="cart-count">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
     <div class="admin-layout">
 
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#6366f1"/>
-                    <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="20" cy="20" r="3" fill="white"/>
-                </svg>
-                <span class="sidebar-logo-text">MOGGES STORE</span>
+                <span class="sidebar-logo-text">Admin Panel</span>
+                <span class="user-role" id="user-email">&mdash;</span>
             </div>
-
             <nav class="sidebar-nav">
                 <a href="#dashboard" class="nav-item active" data-page="dashboard">
                     <span class="nav-icon">&#128202;</span>
@@ -50,23 +86,8 @@
             </nav>
         </aside>
 
-        <!-- Main wrapper -->
-        <div class="main-wrapper">
-
-            <!-- Top header -->
-            <header class="top-header">
-                <div class="header-search">
-                    <input type="text" class="search-input" id="global-search" placeholder="Sok...">
-                </div>
-                <div class="header-user">
-                    <span class="header-user-icon">&#128100;</span>
-                    <span class="header-user-name" id="user-email">Admin</span>
-                    <button class="btn btn-secondary btn-small" id="logout-btn">Logga ut</button>
-                </div>
-            </header>
-
-            <!-- Main content area -->
-            <main class="main-content">
+        <!-- Main content -->
+        <main class="main-content">
 
                 <!-- PAGE: Dashboard -->
                 <section class="page" id="page-dashboard">
@@ -157,8 +178,36 @@
                 </section>
 
             </main>
-        </div>
     </div>
+
+    <!-- Same footer as all pages -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Mogges Store</h3>
+                    <p>Din p&aring;litliga partner f&ouml;r modern fashion och kvalitetskl&auml;der</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Snabbl&auml;nkar</h4>
+                    <ul>
+                        <li><a href="index.html">Hem</a></li>
+                        <li><a href="products.html">Produkter</a></li>
+                        <li><a href="about.html">Om Oss</a></li>
+                        <li><a href="cart.html">Varukorg</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontakt</h4>
+                    <p>Email: info@moggesstore.se</p>
+                    <p>Tel: +46 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mogges Store. Alla r&auml;ttigheter f&ouml;rbeh&aring;llna.</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Product Modal -->
     <div id="product-modal" class="modal">
@@ -218,8 +267,9 @@
         </div>
     </div>
 
-    <script type="module" src="js/config.js?v=4"></script>
-    <script type="module" src="js/cart-common.js?v=4"></script>
-    <script type="module" src="js/admin.js?v=4"></script>
+    <script type="module" src="js/config.js?v=5"></script>
+    <script type="module" src="js/cart-common.js?v=5"></script>
+    <script type="module" src="js/nav-auth.js?v=5"></script>
+    <script type="module" src="js/admin.js?v=5"></script>
 </body>
 </html>

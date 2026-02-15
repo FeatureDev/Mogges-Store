@@ -652,13 +652,6 @@ document.getElementById('product-modal').addEventListener('click', (e) => {
     }
 });
 
-// Logout
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/products.html';
-});
-
 // Initialize
 (async () => {
     const isAuth = await checkAuth();
