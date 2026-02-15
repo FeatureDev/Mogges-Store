@@ -240,6 +240,21 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.stat-economy {
+    border-left: 3px solid var(--success-color);
+}
+
+.stat-economy .stat-icon {
+    background: #d1fae5;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
 .stat-icon {
     font-size: 2rem;
     width: 3rem;

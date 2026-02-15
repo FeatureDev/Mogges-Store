@@ -65,6 +65,21 @@ async function loadDashboardStats() {
             document.getElementById('stat-pending').textContent = ordersData.filter(function(o) { return o.status === 'pending'; }).length;
             document.getElementById('stat-shipped').textContent = ordersData.filter(function(o) { return o.status === 'shipped'; }).length;
             document.getElementById('stat-cancelled').textContent = ordersData.filter(function(o) { return o.status === 'cancelled'; }).length;
+
+            // Ekonomi
+            var paidShipped = ordersData.filter(function(o) { return o.status === 'paid' || o.status === 'shipped'; });
+            var pendingOrders = ordersData.filter(function(o) { return o.status === 'pending'; });
+            var cancelledOrders = ordersData.filter(function(o) { return o.status === 'cancelled'; });
+
+            var income = paidShipped.reduce(function(sum, o) { return sum + (o.total || 0); }, 0);
+            var pendingRev = pendingOrders.reduce(function(sum, o) { return sum + (o.total || 0); }, 0);
+            var cancelledRev = cancelledOrders.reduce(function(sum, o) { return sum + (o.total || 0); }, 0);
+            var avgOrder = ordersData.length > 0 ? ordersData.reduce(function(sum, o) { return sum + (o.total || 0); }, 0) / ordersData.length : 0;
+
+            document.getElementById('stat-income').textContent = Math.round(income).toLocaleString('sv-SE') + ' kr';
+            document.getElementById('stat-pending-revenue').textContent = Math.round(pendingRev).toLocaleString('sv-SE') + ' kr';
+            document.getElementById('stat-avg-order').textContent = Math.round(avgOrder).toLocaleString('sv-SE') + ' kr';
+            document.getElementById('stat-cancelled-revenue').textContent = Math.round(cancelledRev).toLocaleString('sv-SE') + ' kr';
         }
 
         // Fetch users (admin+)
