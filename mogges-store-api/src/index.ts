@@ -761,21 +761,27 @@ app.post('/api/chat', async (c) => {
 			'sko': 'Skor',
 			'sneakers': 'Skor',
 			'dam': 'Dam Mode',
+			'damkläder': 'Dam Mode',
 			'damklader': 'Dam Mode',
 			'dammode': 'Dam Mode',
+			'klänning': 'Dam Mode',
 			'klanning': 'Dam Mode',
+			'blus': 'Dam Mode',
 			'herr': 'Herr Mode',
+			'herrkläder': 'Herr Mode',
 			'herrklader': 'Herr Mode',
 			'herrmode': 'Herr Mode',
+			'skjorta': 'Herr Mode',
 			'accessoarer': 'Accessoarer',
 			'accessoar': 'Accessoarer',
+			'väska': 'Accessoarer',
 			'vaska': 'Accessoarer',
 			'smycke': 'Accessoarer'
 		};
 
 		let action: any = null;
 
-		// Check if message mentions a category — navigate directly
+		// 1. Check if message mentions a category
 		for (const [keyword, category] of Object.entries(categoryMap)) {
 			if (msgLower.includes(keyword)) {
 				action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
@@ -783,14 +789,29 @@ app.post('/api/chat', async (c) => {
 			}
 		}
 
-		// If no category match but has show intent, try free-text search
+		// 2. Check if message mentions a product name from the DB
+		if (!action && products.length > 0) {
+			for (const p of products) {
+				const pName = (p as any).Name.toLowerCase();
+				const pWords = pName.split(/\s+/);
+				for (const word of pWords) {
+					if (word.length > 3 && msgLower.includes(word)) {
+						action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(word), label: 'Visa ' + (p as any).Name };
+						break;
+					}
+				}
+				if (action) break;
+			}
+		}
+
+		// 3. Free-text search fallback
 		if (!action) {
-			const showKeywords = ['visa', 'visar', 'se', 'titta', 'kolla', 'har ni', 'finns det', 'sok', 'hitta', 'vill ha', 'letar efter', 'shoppa'];
+			const showKeywords = ['visa', 'visar', 'se', 'titta', 'kolla', 'har ni', 'finns det', 'sök', 'sok', 'hitta', 'vill ha', 'letar efter', 'shoppa'];
 			const isShowIntent = showKeywords.some(k => msgLower.includes(k));
 			if (isShowIntent) {
-				const searchWords = msgLower.replace(/visa|visar|se|titta|kolla|har ni|finns det|sok|hitta|vill ha|letar efter|shoppa|mig|era|nagra|nagon|kan du|kan jag|pa|i|for|med|ett|en|det|den|de|som/g, '').trim();
+				const searchWords = msgLower.replace(/visa|visar|se|titta|kolla|har ni|finns det|sök|sok|hitta|vill ha|letar efter|shoppa|mig|era|några|nagon|kan du|kan jag|på|pa|i|för|for|med|ett|en|det|den|de|som/g, '').trim();
 				if (searchWords.length > 2) {
-					action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(searchWords), label: 'Sok: ' + searchWords };
+					action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(searchWords), label: 'Sök: ' + searchWords };
 				}
 			}
 		}
