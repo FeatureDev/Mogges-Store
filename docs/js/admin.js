@@ -32,6 +32,7 @@ function setupNavigation() {
             if (targetPage === 'products') loadProducts();
             if (targetPage === 'dashboard') loadDashboardStats();
             if (targetPage === 'users') loadUsers();
+            if (targetPage === 'employees') loadEmployees();
         });
     });
 }
@@ -42,17 +43,31 @@ function setupNavigation() {
 
 async function loadDashboardStats() {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(API_URL + '/api/products', {
+        var token = localStorage.getItem('token');
+        var prodResp = await fetch(API_URL + '/api/products', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
-        const productsData = await response.json();
+        var productsData = await prodResp.json();
 
-        const totalRevenue = productsData.reduce((sum, p) => sum + (p.price * p.stock), 0);
-        document.getElementById('stat-users').textContent = '—';
-        document.getElementById('stat-employees').textContent = '—';
+        var totalRevenue = productsData.reduce(function(sum, p) { return sum + (p.price * p.stock); }, 0);
         document.getElementById('stat-revenue').textContent = Math.round(totalRevenue).toLocaleString('sv-SE') + ' kr';
         document.getElementById('stat-active').textContent = productsData.length;
+
+        if (hasRole(currentUserRole, 'admin')) {
+            var usersResp = await fetch(API_URL + '/api/users', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (usersResp.ok) {
+                var usersData = await usersResp.json();
+                var totalUsers = usersData.filter(function(u) { return u.role === 'user'; }).length;
+                var totalEmployees = usersData.filter(function(u) { return u.role === 'employee'; }).length;
+                document.getElementById('stat-users').textContent = totalUsers;
+                document.getElementById('stat-employees').textContent = totalEmployees;
+            }
+        } else {
+            document.getElementById('stat-users').textContent = '—';
+            document.getElementById('stat-employees').textContent = '—';
+        }
 
         document.getElementById('activity-list').innerHTML =
             '<li>Dashboard laddad</li>' +
@@ -149,6 +164,48 @@ async function loadUsers() {
         }
     } catch (error) {
         container.innerHTML = '<div class="loading">Kunde inte ladda users</div>';
+    }
+}
+
+// ==========================================
+// EMPLOYEES PAGE
+// ==========================================
+
+async function loadEmployees() {
+    var container = document.getElementById('employees-content');
+    try {
+        var token = localStorage.getItem('token');
+        var response = await fetch(API_URL + '/api/users', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) {
+            container.innerHTML = '<div class="loading">Kunde inte ladda anstallda</div>';
+            return;
+        }
+        var allUsers = await response.json();
+        var employees = allUsers.filter(function(u) { return u.role === 'employee'; });
+
+        if (employees.length === 0) {
+            container.innerHTML = '<div class="loading">Inga anstallda hittades</div>';
+            return;
+        }
+
+        var html = '<table class="users-table"><thead><tr>';
+        html += '<th>ID</th><th>Email</th><th>Roll</th>';
+        html += '</tr></thead><tbody>';
+
+        employees.forEach(function(e) {
+            html += '<tr>';
+            html += '<td>' + e.id + '</td>';
+            html += '<td>' + e.email + '</td>';
+            html += '<td><span class="role-badge role-employee">employee</span></td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = '<div class="loading">Kunde inte ladda anstallda</div>';
     }
 }
 
