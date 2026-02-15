@@ -781,6 +781,19 @@ app.post('/api/chat', async (c) => {
 
 		let action: any = null;
 
+		// 0. Check for price filter intent (e.g. "under 500", "billigare än 300")
+		const priceMatch = msgLower.match(/(?:under|billigare\s*(?:än)?|max|upp\s*till|mindre\s*(?:än)?)\s*(\d+)/);
+		if (priceMatch) {
+			const maxPrice = priceMatch[1];
+			action = { type: 'navigate', url: '/products.html?maxPrice=' + maxPrice, label: 'Visa produkter under ' + maxPrice + ' kr' };
+		}
+
+		const priceOverMatch = msgLower.match(/(?:över|dyrare\s*(?:än)?|från|minst)\s*(\d+)/);
+		if (!action && priceOverMatch) {
+			const minPrice = priceOverMatch[1];
+			action = { type: 'navigate', url: '/products.html?minPrice=' + minPrice, label: 'Visa produkter över ' + minPrice + ' kr' };
+		}
+
 		// 1. Check if message mentions a category
 		for (const [keyword, category] of Object.entries(categoryMap)) {
 			if (msgLower.includes(keyword)) {

@@ -104,6 +104,8 @@ async function loadAllProducts() {
         var params = new URLSearchParams(window.location.search);
         var urlCategory = params.get('category');
         var urlSearch = params.get('search');
+        var urlMaxPrice = params.get('maxPrice');
+        var urlMinPrice = params.get('minPrice');
 
         if (urlCategory) {
             var catSelect = document.getElementById('category-filter');
@@ -117,8 +119,8 @@ async function loadAllProducts() {
                 searchInput.value = urlSearch;
             }
         }
-        if (urlCategory || urlSearch) {
-            filterProducts();
+        if (urlCategory || urlSearch || urlMaxPrice || urlMinPrice) {
+            filterProducts(urlMaxPrice ? Number(urlMaxPrice) : null, urlMinPrice ? Number(urlMinPrice) : null);
         }
     } catch (error) {
         console.error('❌ Error loading products:', error);
@@ -171,19 +173,21 @@ function populateCategoryFilter() {
     });
 }
 
-function filterProducts() {
+function filterProducts(maxPrice, minPrice) {
     const categoryFilter = document.getElementById('category-filter').value;
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    
+
     filteredProducts = allProducts.filter(product => {
         const matchesCategory = !categoryFilter || product.category === categoryFilter;
         const matchesSearch = !searchTerm || 
             product.name.toLowerCase().includes(searchTerm) ||
             (product.description && product.description.toLowerCase().includes(searchTerm));
-        
-        return matchesCategory && matchesSearch;
+        const matchesMaxPrice = !maxPrice || product.price <= maxPrice;
+        const matchesMinPrice = !minPrice || product.price >= minPrice;
+
+        return matchesCategory && matchesSearch && matchesMaxPrice && matchesMinPrice;
     });
-    
+
     displayProducts(filteredProducts);
 }
 
