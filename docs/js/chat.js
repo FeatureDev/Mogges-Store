@@ -22,7 +22,8 @@ import { API_BASE_URL } from './config.js';
         } catch (e) {}
     }
 
-    var isOpen = false;
+    var OPEN_KEY = 'mogge_chat_open';
+    var isOpen = sessionStorage.getItem(OPEN_KEY) === 'true';
 
     // Build the widget HTML
     var widget = document.createElement('div');
@@ -70,8 +71,16 @@ import { API_BASE_URL } from './config.js';
     var sendBtn = document.getElementById('chat-send');
     var quickActions = document.getElementById('chat-quick-actions');
 
-    // Show greeting after 2 seconds (only if no history)
-    if (chatHistory.length === 0) {
+    // Restore open state from session
+    if (isOpen) {
+        toggleBtn.classList.add('open');
+        chatWindow.classList.add('open');
+        greeting.classList.add('hidden');
+        setTimeout(function () { inputEl.focus(); }, 100);
+    }
+
+    // Show greeting after 2 seconds (only if no history and not open)
+    if (chatHistory.length === 0 && !isOpen) {
         setTimeout(function () {
             if (!isOpen) greeting.classList.remove('hidden');
         }, 2000);
@@ -104,6 +113,7 @@ import { API_BASE_URL } from './config.js';
         toggleBtn.classList.toggle('open', isOpen);
         chatWindow.classList.toggle('open', isOpen);
         greeting.classList.add('hidden');
+        sessionStorage.setItem(OPEN_KEY, isOpen ? 'true' : 'false');
         if (isOpen) inputEl.focus();
     });
 
@@ -154,6 +164,7 @@ import { API_BASE_URL } from './config.js';
                 // Auto-navigate if action returned
                 if (data.action && data.action.type === 'navigate') {
                     addMessage('\uD83D\uDC49 Jag visar dig det nu...', 'bot');
+                    sessionStorage.setItem(OPEN_KEY, 'true');
                     setTimeout(function () {
                         window.location.href = data.action.url;
                     }, 1200);
