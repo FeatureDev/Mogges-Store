@@ -293,6 +293,27 @@
     border-color: #6366f1;
 }
 
+/* Action button (navigate to products) */
+.chat-action-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.chat-action-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
 /* Input area */
 .chat-input-area {
     display: flex;

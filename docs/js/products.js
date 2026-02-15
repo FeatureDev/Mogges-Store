@@ -94,11 +94,32 @@ async function loadAllProducts() {
 
         allProducts = await response.json();
         filteredProducts = [...allProducts];
-        
+
         console.log('✅ Products loaded:', allProducts.length);
-        
+
         displayProducts(filteredProducts);
         populateCategoryFilter();
+
+        // Apply URL filter params from chatbot navigation
+        var params = new URLSearchParams(window.location.search);
+        var urlCategory = params.get('category');
+        var urlSearch = params.get('search');
+
+        if (urlCategory) {
+            var catSelect = document.getElementById('category-filter');
+            if (catSelect) {
+                catSelect.value = urlCategory;
+            }
+        }
+        if (urlSearch) {
+            var searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = urlSearch;
+            }
+        }
+        if (urlCategory || urlSearch) {
+            filterProducts();
+        }
     } catch (error) {
         console.error('❌ Error loading products:', error);
         displayError('all-products');

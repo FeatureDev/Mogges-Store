@@ -754,15 +754,63 @@ app.post('/api/chat', async (c) => {
 
 		messages.push({ role: 'user', content: message });
 
+		// Detect category/product navigation intent
+		const msgLower = message.toLowerCase();
+		const categoryMap: Record<string, string> = {
+			'skor': 'Skor',
+			'sko': 'Skor',
+			'sneakers': 'Skor',
+			'dam': 'Dam Mode',
+			'damklader': 'Dam Mode',
+			'dammode': 'Dam Mode',
+			'klanning': 'Dam Mode',
+			'herr': 'Herr Mode',
+			'herrklader': 'Herr Mode',
+			'herrmode': 'Herr Mode',
+			'accessoarer': 'Accessoarer',
+			'accessoar': 'Accessoarer',
+			'vaska': 'Accessoarer',
+			'smycke': 'Accessoarer'
+		};
+
+		let action: any = null;
+
+		// Check if the message is asking to see/show products
+		const showKeywords = ['visa', 'visar', 'se', 'titta', 'kolla', 'har ni', 'finns det', 'sok', 'hitta', 'vill ha', 'letar efter', 'shoppa'];
+		const isShowIntent = showKeywords.some(k => msgLower.includes(k));
+
+		if (isShowIntent) {
+			for (const [keyword, category] of Object.entries(categoryMap)) {
+				if (msgLower.includes(keyword)) {
+					action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
+					break;
+				}
+			}
+
+			// If no category match, try search term
+			if (!action) {
+				const searchWords = msgLower.replace(/visa|visar|se|titta|kolla|har ni|finns det|sok|hitta|vill ha|letar efter|shoppa|mig|era|nagra|nagon|kan du|kan jag|pa|i|for|med|ett|en|det|den|de|som/g, '').trim();
+				if (searchWords.length > 2) {
+					action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(searchWords), label: 'Sok: ' + searchWords };
+				}
+			}
+		}
+
 		const response = await c.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
 			messages: messages,
 			max_tokens: 256,
 			temperature: 0.7
 		});
 
-		return c.json({
+		const result: any = {
 			reply: (response as any).response || 'Oj, jag tappade traden! Kan du fraga igen? 💜'
-		});
+		};
+
+		if (action) {
+			result.action = action;
+		}
+
+		return c.json(result);
 	} catch (err) {
 		console.error('Chat error:', err);
 		return c.json({
