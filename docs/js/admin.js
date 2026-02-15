@@ -45,35 +45,47 @@ function setupNavigation() {
 async function loadDashboardStats() {
     try {
         var token = localStorage.getItem('token');
+
+        // Fetch products
         var prodResp = await fetch(API_URL + '/api/products', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         var productsData = await prodResp.json();
-
         var totalRevenue = productsData.reduce(function(sum, p) { return sum + (p.price * p.stock); }, 0);
         document.getElementById('stat-revenue').textContent = Math.round(totalRevenue).toLocaleString('sv-SE') + ' kr';
-        document.getElementById('stat-active').textContent = productsData.length;
+        document.getElementById('stat-products').textContent = productsData.length;
 
+        // Fetch orders
+        var ordersResp = await fetch(API_URL + '/api/orders', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (ordersResp.ok) {
+            var ordersData = await ordersResp.json();
+            document.getElementById('stat-orders').textContent = ordersData.length;
+            document.getElementById('stat-pending').textContent = ordersData.filter(function(o) { return o.status === 'pending'; }).length;
+            document.getElementById('stat-shipped').textContent = ordersData.filter(function(o) { return o.status === 'shipped'; }).length;
+            document.getElementById('stat-cancelled').textContent = ordersData.filter(function(o) { return o.status === 'cancelled'; }).length;
+        }
+
+        // Fetch users (admin+)
         if (hasRole(currentUserRole, 'admin')) {
             var usersResp = await fetch(API_URL + '/api/users', {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
             if (usersResp.ok) {
                 var usersData = await usersResp.json();
-                var totalUsers = usersData.filter(function(u) { return u.role === 'user'; }).length;
-                var totalEmployees = usersData.filter(function(u) { return u.role === 'employee'; }).length;
-                document.getElementById('stat-users').textContent = totalUsers;
-                document.getElementById('stat-employees').textContent = totalEmployees;
+                document.getElementById('stat-users').textContent = usersData.filter(function(u) { return u.role === 'user'; }).length;
+                document.getElementById('stat-employees').textContent = usersData.filter(function(u) { return u.role === 'employee'; }).length;
             }
         } else {
-            document.getElementById('stat-users').textContent = '—';
-            document.getElementById('stat-employees').textContent = '—';
+            document.getElementById('stat-users').textContent = '\u2014';
+            document.getElementById('stat-employees').textContent = '\u2014';
         }
 
         document.getElementById('activity-list').innerHTML =
-            '<li>Dashboard laddad</li>' +
             '<li>' + productsData.length + ' produkter i databasen</li>' +
-            '<li>API: ' + API_URL + '</li>';
+            '<li>' + document.getElementById('stat-orders').textContent + ' ordrar totalt</li>' +
+            '<li>Revenue: ' + document.getElementById('stat-revenue').textContent + '</li>';
     } catch (error) {
         console.error('Dashboard stats error:', error);
     }
