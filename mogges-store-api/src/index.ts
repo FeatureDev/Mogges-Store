@@ -775,20 +775,19 @@ app.post('/api/chat', async (c) => {
 
 		let action: any = null;
 
-		// Check if the message is asking to see/show products
-		const showKeywords = ['visa', 'visar', 'se', 'titta', 'kolla', 'har ni', 'finns det', 'sok', 'hitta', 'vill ha', 'letar efter', 'shoppa'];
-		const isShowIntent = showKeywords.some(k => msgLower.includes(k));
-
-		if (isShowIntent) {
-			for (const [keyword, category] of Object.entries(categoryMap)) {
-				if (msgLower.includes(keyword)) {
-					action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
-					break;
-				}
+		// Check if message mentions a category — navigate directly
+		for (const [keyword, category] of Object.entries(categoryMap)) {
+			if (msgLower.includes(keyword)) {
+				action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
+				break;
 			}
+		}
 
-			// If no category match, try search term
-			if (!action) {
+		// If no category match but has show intent, try free-text search
+		if (!action) {
+			const showKeywords = ['visa', 'visar', 'se', 'titta', 'kolla', 'har ni', 'finns det', 'sok', 'hitta', 'vill ha', 'letar efter', 'shoppa'];
+			const isShowIntent = showKeywords.some(k => msgLower.includes(k));
+			if (isShowIntent) {
 				const searchWords = msgLower.replace(/visa|visar|se|titta|kolla|har ni|finns det|sok|hitta|vill ha|letar efter|shoppa|mig|era|nagra|nagon|kan du|kan jag|pa|i|for|med|ett|en|det|den|de|som/g, '').trim();
 				if (searchWords.length > 2) {
 					action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(searchWords), label: 'Sok: ' + searchWords };
