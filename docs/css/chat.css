@@ -115,6 +115,7 @@
     right: 0;
     width: 380px;
     height: 520px;
+    max-height: calc(100vh - 160px);
     background: white;
     border-radius: 20px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
@@ -392,6 +393,7 @@
     .chat-window {
         width: calc(100vw - 32px);
         height: calc(100vh - 120px);
+        max-height: calc(100vh - 160px);
         bottom: 72px;
         right: -8px;
         border-radius: 16px;
