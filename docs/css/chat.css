@@ -168,6 +168,25 @@
     margin: 2px 0 0;
 }
 
+.chat-clear-btn {
+    margin-left: auto;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.chat-clear-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
 .chat-status {
     display: inline-block;
     width: 8px;

@@ -39,6 +39,9 @@ import { API_BASE_URL } from './config.js';
                     '<h3>Mogge</h3>' +
                     '<p><span class="chat-status"></span>Din personliga shoppingv\u00E4n</p>' +
                 '</div>' +
+                '<button class="chat-clear-btn" id="chat-clear" title="Rensa chatt">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>' +
+                '</button>' +
             '</div>' +
             '<div class="chat-messages" id="chat-messages">' +
                 '<div class="chat-msg bot">Hej d\u00E4r! \uD83D\uDC4B Jag \u00E4r Mogge, din personliga shoppingassistent. Vad kan jag hj\u00E4lpa dig med idag? \uD83D\uDC9C</div>' +
@@ -211,5 +214,14 @@ import { API_BASE_URL } from './config.js';
     quickActions.addEventListener('click', function (e) {
         var btn = e.target.closest('.chat-quick-btn');
         if (btn) sendMessage(btn.dataset.msg);
+    });
+
+    // Clear chat button
+    document.getElementById('chat-clear').addEventListener('click', function () {
+        chatHistory = [];
+        sessionStorage.removeItem(STORAGE_KEY);
+        messagesEl.innerHTML =
+            '<div class="chat-msg bot">Hej d\u00E4r! \uD83D\uDC4B Jag \u00E4r Mogge, din personliga shoppingassistent. Vad kan jag hj\u00E4lpa dig med idag? \uD83D\uDC9C</div>';
+        quickActions.style.display = 'flex';
     });
 })();
