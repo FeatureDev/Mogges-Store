@@ -51,7 +51,8 @@ loginForm.addEventListener('submit', async (e) => {
             
             // Redirect based on role
             setTimeout(() => {
-                if (data.user.role === 'admin') {
+                const adminRoles = ['master', 'admin', 'employee'];
+                if (adminRoles.includes(data.user.role)) {
                     window.location.href = '/admin.html';
                 } else {
                     window.location.href = '/index.html';
