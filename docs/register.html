@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Registrera konto - Mogges Store">
+    <meta name="theme-color" content="#6366f1">
+    <title>Registrera - Mogges Store</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <svg width="60" height="60" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="8" fill="#6366f1"/>
+                    <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <h1>Mogges Store</h1>
+                <p>Skapa ett konto</p>
+            </div>
+
+            <form id="register-form" class="login-form">
+                <div class="form-group">
+                    <label for="name">Namn</label>
+                    <input type="text" id="name" name="name" required placeholder="Ditt namn">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-post</label>
+                    <input type="email" id="email" name="email" required placeholder="dinmail@exempel.se">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Lösenord</label>
+                    <input type="password" id="password" name="password" required placeholder="********">
+                </div>
+
+                <div id="error-message" class="error-message" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="register-button">
+                    Skapa konto
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="login.html" class="back-link">Har du redan ett konto? Logga in</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/config.js?v=2"></script>
+    <script type="module" src="js/cart-common.js?v=2"></script>
+    <script type="module" src="js/register.js?v=1"></script>
+    <!-- Registration logic will be added later -->
+</body>
+</html>
