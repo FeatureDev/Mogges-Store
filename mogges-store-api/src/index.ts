@@ -5,6 +5,7 @@ import { cors } from 'hono/cors';
 
 type Bindings = {
 	DB: D1Database;
+	AI: Ai;
 };
 
 type JwtPayload = {
@@ -663,6 +664,110 @@ app.post('/api/admin/create-user', async (c) => {
 	} catch (err) {
 		console.error('Admin create user error:', err);
 		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+
+// ==========================================
+// CHATBOT - "Mogge" (Workers AI)
+// ==========================================
+
+const MOGGE_SYSTEM_PROMPT = `Du ar Mogge, den varma och personliga shoppingassistenten pa Mogges Store — en modern klädbutik online.
+
+Personlighet:
+- Du ar glad, omtanksam och lite charmig med humor
+- Du anvander hjart-emojis 💜 ibland men inte for mycket
+- Du ar som en vanlig kompis som jobbar i en klädbutik
+- Du svarar ALLTID pa svenska
+- Du haller svaren korta och trevliga (max 2-3 meningar)
+- Om nagon verkar ledsen eller stressad, var extra snall
+
+Butiksinformation:
+- Butiken heter Mogges Store (mogges-store.se)
+- Vi saljer klader: Dam Mode, Herr Mode, Accessoarer, Skor
+- Fri frakt over 499 kr
+- 30 dagars öppet kop
+- Kontakt: info@moggesstore.se, tel: +46 123 456 789
+
+Regler:
+- Svara BARA om shopping, klader, butiken eller kundservice
+- Om nagon fragar om politik, religion eller olämpliga amnen: avled artigt tillbaka till shopping
+- Anvand ALDRIG engelska om inte kunden skriver pa engelska
+- Om du far produktdata, rekommendera baserat pa den`;
+
+app.post('/api/chat', async (c) => {
+	const { message, history } = await c.req.json();
+
+	if (!message || typeof message !== 'string') {
+		return c.json({ error: 'Message required' }, 400);
+	}
+
+	try {
+		// Fetch products for context
+		const { results: products } = await c.env.DB
+			.prepare('SELECT Name, Price, Category, Stock FROM Products WHERE Stock > 0 LIMIT 20')
+			.all();
+
+		const productContext = products.length > 0
+			? '\n\nProdukter i lager just nu:\n' + products.map((p: any) =>
+				`- ${p.Name} (${p.Category}) - ${p.Price} kr, ${p.Stock} i lager`
+			).join('\n')
+			: '';
+
+		// Check if user is logged in and get their order info
+		let orderContext = '';
+		const user = await getAuthUser(c);
+		if (user) {
+			const { results: orders } = await c.env.DB
+				.prepare(`
+					SELECT o.Id, o.Status, o.CreatedAt, SUM(oi.Quantity * oi.Price) as total
+					FROM Orders o
+					JOIN OrderItems oi ON oi.OrderId = o.Id
+					WHERE o.UserId = ?
+					GROUP BY o.Id
+					ORDER BY o.CreatedAt DESC
+					LIMIT 3
+				`)
+				.bind(user.sub)
+				.all();
+
+			if (orders.length > 0) {
+				orderContext = '\n\nKundens ordrar:\n' + orders.map((o: any) =>
+					`- Order #${o.Id}: ${o.Status}, ${Math.round(o.total)} kr (${o.CreatedAt})`
+				).join('\n');
+			}
+		}
+
+		const messages: Array<{ role: string; content: string }> = [
+			{ role: 'system', content: MOGGE_SYSTEM_PROMPT + productContext + orderContext }
+		];
+
+		// Add conversation history (last 6 messages)
+		if (Array.isArray(history)) {
+			const recentHistory = history.slice(-6);
+			for (const h of recentHistory) {
+				if (h.role === 'user' || h.role === 'assistant') {
+					messages.push({ role: h.role, content: h.content });
+				}
+			}
+		}
+
+		messages.push({ role: 'user', content: message });
+
+		const response = await c.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+			messages: messages,
+			max_tokens: 256,
+			temperature: 0.7
+		});
+
+		return c.json({
+			reply: (response as any).response || 'Oj, jag tappade traden! Kan du fraga igen? 💜'
+		});
+	} catch (err) {
+		console.error('Chat error:', err);
+		return c.json({
+			reply: 'Oj, nagonting gick fel hos mig! Prova igen om en stund 💜'
+		});
 	}
 });
 

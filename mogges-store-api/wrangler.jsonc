@@ -42,7 +42,12 @@
 			"pattern": "api.mogges-store.se",
 			"custom_domain": true
 		}
-	]
+	],
+
+	// Cloudflare Workers AI binding
+	"ai": {
+		"binding": "AI"
+	}
 
 	// Optional: Smart placement (can be enabled later)
 	// "placement": { "mode": "smart" }
