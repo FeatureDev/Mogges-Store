@@ -2,7 +2,26 @@
 import { API_BASE_URL } from './config.js';
 
 (function () {
+    var MAX_HISTORY = 10;
+    var STORAGE_KEY = 'mogge_chat_history';
+
+    // Load history from sessionStorage
     var chatHistory = [];
+    try {
+        var stored = sessionStorage.getItem(STORAGE_KEY);
+        if (stored) chatHistory = JSON.parse(stored);
+    } catch (e) {}
+
+    function saveHistory() {
+        // Keep only last MAX_HISTORY messages
+        if (chatHistory.length > MAX_HISTORY * 2) {
+            chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
+        }
+        try {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+        } catch (e) {}
+    }
+
     var isOpen = false;
 
     // Build the widget HTML
@@ -51,15 +70,33 @@ import { API_BASE_URL } from './config.js';
     var sendBtn = document.getElementById('chat-send');
     var quickActions = document.getElementById('chat-quick-actions');
 
-    // Show greeting after 2 seconds
-    setTimeout(function () {
-        if (!isOpen) greeting.classList.remove('hidden');
-    }, 2000);
+    // Show greeting after 2 seconds (only if no history)
+    if (chatHistory.length === 0) {
+        setTimeout(function () {
+            if (!isOpen) greeting.classList.remove('hidden');
+        }, 2000);
 
-    // Hide greeting after 8 seconds
-    setTimeout(function () {
-        greeting.classList.add('hidden');
-    }, 10000);
+        setTimeout(function () {
+            greeting.classList.add('hidden');
+        }, 10000);
+    }
+
+    // Restore previous messages from history
+    if (chatHistory.length > 0) {
+        // Clear default greeting
+        messagesEl.innerHTML = '';
+        quickActions.style.display = 'none';
+
+        for (var i = 0; i < chatHistory.length; i++) {
+            var h = chatHistory[i];
+            var type = h.role === 'user' ? 'user' : 'bot';
+            var msg = document.createElement('div');
+            msg.className = 'chat-msg ' + type;
+            msg.textContent = h.content;
+            messagesEl.appendChild(msg);
+        }
+        scrollToBottom();
+    }
 
     // Toggle chat
     toggleBtn.addEventListener('click', function () {
@@ -80,6 +117,7 @@ import { API_BASE_URL } from './config.js';
         // Add user message
         addMessage(text, 'user');
         chatHistory.push({ role: 'user', content: text });
+        saveHistory();
         inputEl.value = '';
 
         // Show typing indicator
@@ -102,7 +140,7 @@ import { API_BASE_URL } from './config.js';
             headers: headers,
             body: JSON.stringify({
                 message: text,
-                history: chatHistory.slice(-6)
+                history: chatHistory.slice(-20)
             })
         })
             .then(function (r) { return r.json(); })
@@ -111,6 +149,7 @@ import { API_BASE_URL } from './config.js';
                 var reply = data.reply || 'Hmm, jag fick inget svar. Prova igen! \uD83D\uDC9C';
                 addMessage(reply, 'bot');
                 chatHistory.push({ role: 'assistant', content: reply });
+                saveHistory();
 
                 // Auto-navigate if action returned
                 if (data.action && data.action.type === 'navigate') {

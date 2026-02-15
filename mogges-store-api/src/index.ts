@@ -742,9 +742,9 @@ app.post('/api/chat', async (c) => {
 			{ role: 'system', content: MOGGE_SYSTEM_PROMPT + productContext + orderContext }
 		];
 
-		// Add conversation history (last 6 messages)
+		// Add conversation history (last 10 exchanges)
 		if (Array.isArray(history)) {
-			const recentHistory = history.slice(-6);
+			const recentHistory = history.slice(-20);
 			for (const h of recentHistory) {
 				if (h.role === 'user' || h.role === 'assistant') {
 					messages.push({ role: h.role, content: h.content });
