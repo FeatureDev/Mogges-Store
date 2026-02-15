@@ -38,3 +38,13 @@ CREATE TABLE OrderItems (
     FOREIGN KEY (OrderId) REFERENCES Orders(Id),
     FOREIGN KEY (ProductId) REFERENCES Products(Id)
 );
+
+CREATE TABLE Cart (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    Quantity INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (UserId) REFERENCES Users(Id),
+    FOREIGN KEY (ProductId) REFERENCES Products(Id),
+    UNIQUE(UserId, ProductId)
+);

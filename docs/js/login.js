@@ -1,4 +1,5 @@
 ﻿import { API_BASE_URL } from './config.js';
+import { syncCartToDb } from './cart-common.js';
 
 console.log('ö Login page loaded');
 
@@ -42,7 +43,10 @@ loginForm.addEventListener('submit', async (e) => {
             // Save JWT token
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            
+
+            // Sync localStorage cart to database
+            await syncCartToDb();
+
             // Show success message
             errorMessage.style.display = 'block';
             errorMessage.style.background = '#d1fae5';

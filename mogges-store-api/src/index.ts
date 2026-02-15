@@ -348,6 +348,124 @@ app.delete('/api/admin/delete-user/:id', async (c) => {
 });
 
 // ==========================================
+// CART ROUTES (authenticated users)
+// ==========================================
+
+app.get('/api/cart', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user) return c.json({ error: 'Unauthorized' }, 401);
+
+	try {
+		const { results } = await c.env.DB
+			.prepare(`
+				SELECT c.ProductId as id, p.Name as name, p.Price as price, p.Image as image, p.Category as category, c.Quantity as quantity
+				FROM Cart c
+				JOIN Products p ON c.ProductId = p.Id
+				WHERE c.UserId = ?
+			`)
+			.bind(user.sub)
+			.all();
+		return c.json(results);
+	} catch (err) {
+		console.error('Error fetching cart:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.post('/api/cart', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user) return c.json({ error: 'Unauthorized' }, 401);
+
+	const { productId, quantity } = await c.req.json();
+	if (!productId || !quantity || quantity < 1) {
+		return c.json({ error: 'productId and quantity required' }, 400);
+	}
+
+	try {
+		await c.env.DB
+			.prepare(`
+				INSERT INTO Cart (UserId, ProductId, Quantity) VALUES (?, ?, ?)
+				ON CONFLICT(UserId, ProductId) DO UPDATE SET Quantity = ?
+			`)
+			.bind(user.sub, productId, quantity, quantity)
+			.run();
+		return c.json({ message: 'Cart updated' });
+	} catch (err) {
+		console.error('Error updating cart:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.post('/api/cart/sync', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user) return c.json({ error: 'Unauthorized' }, 401);
+
+	const { items } = await c.req.json();
+	if (!Array.isArray(items)) return c.json({ error: 'items array required' }, 400);
+
+	try {
+		for (const item of items) {
+			if (!item.id || !item.quantity) continue;
+			await c.env.DB
+				.prepare(`
+					INSERT INTO Cart (UserId, ProductId, Quantity) VALUES (?, ?, ?)
+					ON CONFLICT(UserId, ProductId) DO UPDATE SET Quantity = Quantity + ?
+				`)
+				.bind(user.sub, item.id, item.quantity, item.quantity)
+				.run();
+		}
+
+		const { results } = await c.env.DB
+			.prepare(`
+				SELECT c.ProductId as id, p.Name as name, p.Price as price, p.Image as image, p.Category as category, c.Quantity as quantity
+				FROM Cart c
+				JOIN Products p ON c.ProductId = p.Id
+				WHERE c.UserId = ?
+			`)
+			.bind(user.sub)
+			.all();
+
+		return c.json(results);
+	} catch (err) {
+		console.error('Error syncing cart:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.delete('/api/cart/:productId', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user) return c.json({ error: 'Unauthorized' }, 401);
+
+	const productId = c.req.param('productId');
+	try {
+		await c.env.DB
+			.prepare('DELETE FROM Cart WHERE UserId = ? AND ProductId = ?')
+			.bind(user.sub, productId)
+			.run();
+		return c.json({ message: 'Item removed' });
+	} catch (err) {
+		console.error('Error removing cart item:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.delete('/api/cart', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user) return c.json({ error: 'Unauthorized' }, 401);
+
+	try {
+		await c.env.DB
+			.prepare('DELETE FROM Cart WHERE UserId = ?')
+			.bind(user.sub)
+			.run();
+		return c.json({ message: 'Cart cleared' });
+	} catch (err) {
+		console.error('Error clearing cart:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+// ==========================================
 // ORDERS ROUTES (employee+)
 // ==========================================
 
