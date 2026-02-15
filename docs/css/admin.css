@@ -695,6 +695,36 @@ form {
     color: #374151;
 }
 
+/* Order badges */
+.order-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.order-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.order-paid {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.order-shipped {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.order-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 /* ==========================================
    SHARED FOOTER (same as other pages)
    ========================================== */

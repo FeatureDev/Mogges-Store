@@ -20,3 +20,21 @@ CREATE TABLE Products (
     Stock INTEGER NOT NULL,
     Image TEXT
 );
+
+CREATE TABLE Orders (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER NOT NULL,
+    Status TEXT NOT NULL CHECK(Status IN ('pending', 'paid', 'shipped', 'cancelled')),
+    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE TABLE OrderItems (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    OrderId INTEGER NOT NULL,
+    ProductId INTEGER NOT NULL,
+    Quantity INTEGER NOT NULL,
+    Price REAL NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES Orders(Id),
+    FOREIGN KEY (ProductId) REFERENCES Products(Id)
+);

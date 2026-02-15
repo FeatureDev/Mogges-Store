@@ -33,6 +33,7 @@ function setupNavigation() {
             if (targetPage === 'dashboard') loadDashboardStats();
             if (targetPage === 'users') loadUsers();
             if (targetPage === 'employees') loadEmployees();
+            if (targetPage === 'orders') loadOrders();
         });
     });
 }
@@ -206,6 +207,89 @@ async function loadEmployees() {
         container.innerHTML = html;
     } catch (error) {
         container.innerHTML = '<div class="loading">Kunde inte ladda anstallda</div>';
+    }
+}
+
+// ==========================================
+// ORDERS PAGE
+// ==========================================
+
+async function loadOrders() {
+    var container = document.getElementById('orders-content');
+    try {
+        var token = localStorage.getItem('token');
+        var response = await fetch(API_URL + '/api/orders', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) {
+            container.innerHTML = '<div class="loading">Kunde inte ladda ordrar</div>';
+            return;
+        }
+        var orders = await response.json();
+
+        if (orders.length === 0) {
+            container.innerHTML = '<div class="loading">Inga ordrar hittades</div>';
+            return;
+        }
+
+        var canEdit = hasRole(currentUserRole, 'admin');
+        var statusOptions = ['pending', 'paid', 'shipped', 'cancelled'];
+
+        var html = '<table class="users-table"><thead><tr>';
+        html += '<th>Order #</th><th>Kund</th><th>Artiklar</th><th>Totalt</th><th>Status</th><th>Datum</th>';
+        html += '</tr></thead><tbody>';
+
+        orders.forEach(function(o) {
+            html += '<tr>';
+            html += '<td>#' + o.id + '</td>';
+            html += '<td>' + o.email + '</td>';
+            html += '<td>' + o.itemCount + ' st</td>';
+            html += '<td>' + Math.round(o.total).toLocaleString('sv-SE') + ' kr</td>';
+
+            if (canEdit) {
+                html += '<td><select class="role-select order-status-select" data-order-id="' + o.id + '">';
+                statusOptions.forEach(function(s) {
+                    var selected = s === o.status ? ' selected' : '';
+                    html += '<option value="' + s + '"' + selected + '>' + s + '</option>';
+                });
+                html += '</select></td>';
+            } else {
+                html += '<td><span class="order-badge order-' + o.status + '">' + o.status + '</span></td>';
+            }
+
+            html += '<td>' + o.createdAt + '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        if (canEdit) {
+            container.querySelectorAll('.order-status-select').forEach(function(sel) {
+                sel.addEventListener('change', async function() {
+                    var orderId = this.dataset.orderId;
+                    var newStatus = this.value;
+                    var t = localStorage.getItem('token');
+                    var resp = await fetch(API_URL + '/api/orders/' + orderId + '/status', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    if (resp.ok) {
+                        var msg = document.createElement('div');
+                        msg.className = 'success-toast';
+                        msg.textContent = 'Order #' + orderId + ' uppdaterad!';
+                        document.body.appendChild(msg);
+                        setTimeout(function() { msg.remove(); }, 2000);
+                    } else {
+                        alert('Kunde inte uppdatera order');
+                        loadOrders();
+                    }
+                });
+            });
+        }
+    } catch (error) {
+        container.innerHTML = '<div class="loading">Kunde inte ladda ordrar</div>';
     }
 }
 

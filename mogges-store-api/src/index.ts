@@ -345,6 +345,87 @@ app.delete('/api/admin/delete-user/:id', async (c) => {
 });
 
 // ==========================================
+// ORDERS ROUTES (employee+)
+// ==========================================
+
+app.get('/api/orders', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'employee')) {
+		return c.json({ error: 'Forbidden' }, 403);
+	}
+
+	try {
+		const { results } = await c.env.DB
+			.prepare(`
+				SELECT o.Id as id, u.Email as email, o.Status as status, o.CreatedAt as createdAt,
+					   COUNT(oi.Id) as itemCount, SUM(oi.Quantity * oi.Price) as total
+				FROM Orders o
+				JOIN Users u ON o.UserId = u.Id
+				JOIN OrderItems oi ON oi.OrderId = o.Id
+				GROUP BY o.Id
+				ORDER BY o.CreatedAt DESC
+			`)
+			.all();
+		return c.json(results);
+	} catch (err) {
+		console.error('Error fetching orders:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.get('/api/orders/:id', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'employee')) {
+		return c.json({ error: 'Forbidden' }, 403);
+	}
+
+	const id = c.req.param('id');
+	try {
+		const order = await c.env.DB
+			.prepare('SELECT o.Id as id, u.Email as email, o.Status as status, o.CreatedAt as createdAt FROM Orders o JOIN Users u ON o.UserId = u.Id WHERE o.Id = ?')
+			.bind(id)
+			.first();
+
+		if (!order) return c.json({ error: 'Order not found' }, 404);
+
+		const { results: items } = await c.env.DB
+			.prepare('SELECT oi.Id as id, p.Name as productName, oi.Quantity as quantity, oi.Price as price FROM OrderItems oi JOIN Products p ON oi.ProductId = p.Id WHERE oi.OrderId = ?')
+			.bind(id)
+			.all();
+
+		return c.json({ ...order, items });
+	} catch (err) {
+		console.error('Error fetching order:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+app.put('/api/orders/:id/status', async (c) => {
+	const user = await getAuthUser(c);
+	if (!user || !hasRole(user.role, 'admin')) {
+		return c.json({ error: 'Forbidden - Admin access required' }, 403);
+	}
+
+	const id = c.req.param('id');
+	const { status } = await c.req.json();
+
+	if (!['pending', 'paid', 'shipped', 'cancelled'].includes(status)) {
+		return c.json({ error: 'Invalid status' }, 400);
+	}
+
+	try {
+		await c.env.DB
+			.prepare('UPDATE Orders SET Status = ? WHERE Id = ?')
+			.bind(status, id)
+			.run();
+		return c.json({ message: 'Order status updated' });
+	} catch (err) {
+		console.error('Error updating order:', err);
+		return c.json({ error: 'Server error' }, 500);
+	}
+});
+
+// ==========================================
 // ADMIN ROUTES (protected)
 // ==========================================
 
