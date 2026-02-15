@@ -174,6 +174,9 @@ function populateCategoryFilter() {
 }
 
 function filterProducts(maxPrice, minPrice) {
+    if (maxPrice instanceof Event || typeof maxPrice === 'undefined') maxPrice = null;
+    if (minPrice instanceof Event || typeof minPrice === 'undefined') minPrice = null;
+
     const categoryFilter = document.getElementById('category-filter').value;
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
 
