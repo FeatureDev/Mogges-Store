@@ -112,20 +112,12 @@ import { API_BASE_URL } from './config.js';
                 addMessage(reply, 'bot');
                 chatHistory.push({ role: 'assistant', content: reply });
 
-                // Show navigation button if action returned
+                // Auto-navigate if action returned
                 if (data.action && data.action.type === 'navigate') {
-                    var actionDiv = document.createElement('div');
-                    actionDiv.className = 'chat-msg bot';
-                    actionDiv.style.padding = '0';
-                    var actionBtn = document.createElement('button');
-                    actionBtn.className = 'chat-action-btn';
-                    actionBtn.innerHTML = '\uD83D\uDC49 ' + (data.action.label || 'Visa produkter');
-                    actionBtn.addEventListener('click', function () {
+                    addMessage('\uD83D\uDC49 Jag visar dig det nu...', 'bot');
+                    setTimeout(function () {
                         window.location.href = data.action.url;
-                    });
-                    actionDiv.appendChild(actionBtn);
-                    messagesEl.appendChild(actionDiv);
-                    scrollToBottom();
+                    }, 1200);
                 }
             })
             .catch(function () {
