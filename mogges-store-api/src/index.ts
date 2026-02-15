@@ -817,8 +817,23 @@ app.post('/api/chat', async (c) => {
 
 		// 2. Check if message mentions a product name from the DB
 		if (!action && products.length > 0) {
+			// Extract meaningful words from user message (3+ chars, no common words)
+			const skipWords = ['kan', 'jag', 'har', 'det', 'den', 'vill', 'som', 'med', 'och', 'att', 'för', 'ett', 'inte', 'var', 'hur', 'vad', 'till', 'alla'];
+			const userWords = msgLower.split(/\s+/).filter(w => w.length >= 3 && !skipWords.includes(w));
+
 			for (const p of products) {
 				const pName = (p as any).Name.toLowerCase();
+
+				// Check if any user word appears in product name, or product word appears in message
+				for (const uw of userWords) {
+					if (pName.includes(uw)) {
+						action = { type: 'navigate', url: '/products.html?search=' + encodeURIComponent(uw), label: 'Visa ' + (p as any).Name };
+						break;
+					}
+				}
+				if (action) break;
+
+				// Also check if a product name word appears in message
 				const pWords = pName.split(/\s+/);
 				for (const word of pWords) {
 					if (word.length > 3 && msgLower.includes(word)) {
