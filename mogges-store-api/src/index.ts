@@ -781,24 +781,37 @@ app.post('/api/chat', async (c) => {
 
 		let action: any = null;
 
-		// 0. Check for price filter intent (e.g. "under 500", "billigare än 300")
-		const priceMatch = msgLower.match(/(?:under|billigare\s*(?:än)?|max|upp\s*till|mindre\s*(?:än)?)\s*(\d+)/);
-		if (priceMatch) {
-			const maxPrice = priceMatch[1];
+		// 0. Check for price filter intent
+		// "under 500", "billigare än 300", "<500", "max 400"
+		const priceUnderMatch = msgLower.match(/(?:under|billigare\s*(?:än)?|max|upp\s*till|mindre\s*(?:än)?|<)\s*(\d+)/);
+		if (priceUnderMatch) {
+			const maxPrice = priceUnderMatch[1];
 			action = { type: 'navigate', url: '/products.html?maxPrice=' + maxPrice, label: 'Visa produkter under ' + maxPrice + ' kr' };
 		}
 
-		const priceOverMatch = msgLower.match(/(?:över|dyrare\s*(?:än)?|från|minst)\s*(\d+)/);
-		if (!action && priceOverMatch) {
-			const minPrice = priceOverMatch[1];
-			action = { type: 'navigate', url: '/products.html?minPrice=' + minPrice, label: 'Visa produkter över ' + minPrice + ' kr' };
+		// "över 1000", "dyrare än 800", ">500", "500+", "från 600", "minst 500"
+		if (!action) {
+			const priceOverMatch = msgLower.match(/(?:över|dyrare\s*(?:än)?|från|minst|>)\s*(\d+)/);
+			if (priceOverMatch) {
+				const minPrice = priceOverMatch[1];
+				action = { type: 'navigate', url: '/products.html?minPrice=' + minPrice, label: 'Visa produkter över ' + minPrice + ' kr' };
+			}
+		}
+		if (!action) {
+			const plusMatch = msgLower.match(/(\d+)\s*\+/);
+			if (plusMatch) {
+				const minPrice = plusMatch[1];
+				action = { type: 'navigate', url: '/products.html?minPrice=' + minPrice, label: 'Visa produkter över ' + minPrice + ' kr' };
+			}
 		}
 
 		// 1. Check if message mentions a category
-		for (const [keyword, category] of Object.entries(categoryMap)) {
-			if (msgLower.includes(keyword)) {
-				action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
-				break;
+		if (!action) {
+			for (const [keyword, category] of Object.entries(categoryMap)) {
+				if (msgLower.includes(keyword)) {
+					action = { type: 'navigate', url: '/products.html?category=' + encodeURIComponent(category), label: 'Visa ' + category };
+					break;
+				}
 			}
 		}
 
