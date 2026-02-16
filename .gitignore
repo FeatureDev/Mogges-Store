@@ -11,9 +11,7 @@ build/
 
 # IDE
 .vs/
-.vscode/*
-!.vscode/launch.json
-!.vscode/tasks.json
+.vscode/
 *.user
 *.suo
 *.userosscache
