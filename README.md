@@ -22,7 +22,7 @@ En modern serverless e-handelsbutik byggd med Cloudflare Workers och GitHub Page
 ## 📁 Projektstruktur
 
 ```
-Node_android_project/
+Mogges-Store/
 ├── docs/                    ← Frontend → GitHub Pages (mogges-store.se)
 │   ├── index.html
 │   ├── products.html
