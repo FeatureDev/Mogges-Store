@@ -1,265 +1,178 @@
-# Mogges Store - E-commerce Platform
+﻿# Mogges Store - E-commerce Platform
 
-En fullst�ndig e-commerce webbshop med Node.js backend och statisk frontend.
+En modern serverless e-handelsbutik byggd med Cloudflare Workers och GitHub Pages.
 
-## ?? Deploy med Ngrok (Fungerar fr�n vilket WiFi som helst!)
-
-### **Backend (Telefon/Dator med Ngrok)**
-
-#### **1. Installera Node.js och projektet**
-
-**P� Telefon (Termux):**
-```bash
-pkg update
-pkg install nodejs git
-git clone https://github.com/FeatureDev/Node_Android_project
-cd Node_Android_project
-npm install
-npm run init-db
-```
-
-**P� Dator:**
-```bash
-git clone https://github.com/FeatureDev/Node_Android_project
-cd Node_Android_project
-npm install
-npm run init-db
-```
-
-#### **2. Installera Ngrok**
-
-**P� Telefon (Termux):**
-```bash
-# Download ngrok for Android ARM
-pkg install wget
-wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
-tar -xvzf ngrok-v3-stable-linux-arm64.tgz
-mv ngrok /data/data/com.termux/files/usr/bin/
-chmod +x /data/data/com.termux/files/usr/bin/ngrok
-```
-
-**P� Dator (Windows):**
-1. G� till: https://ngrok.com/download
-2. Ladda ner f�r Windows
-3. Extrahera och l�gg i PATH eller k�r fr�n mappen
-
-#### **3. Skapa gratis Ngrok-konto**
-
-1. G� till: https://dashboard.ngrok.com/signup
-2. Skapa konto (gratis)
-3. Kopiera din **authtoken** fr�n dashboard
-
-#### **4. Konfigurera Ngrok**
-
-```bash
-ngrok config add-authtoken <DIN_AUTHTOKEN>
-```
-
-#### **5. Starta Backend**
-
-```bash
-npm start
-```
-
-Backend k�rs nu p� port 3000.
-
-#### **6. �ppna Ngrok Tunnel (ny terminal/tab)**
-
-**P� Telefon:** Svajpa fr�n v�nster i Termux ? New session
-
-**P� Dator:** �ppna ny terminal/PowerShell
-
-```bash
-ngrok http 3000
-```
-
-**Ngrok visar din publika URL:**
-```
-Forwarding: https://abc123.ngrok-free.app -> http://localhost:3000
-```
-
-**Kopiera HTTPS-URL:en!** (t.ex. `https://abc123.ngrok-free.app`)
+🌐 **Live:** [mogges-store.se](https://www.mogges-store.se)
+🔗 **API:** [api.mogges-store.se](https://api.mogges-store.se/api)
 
 ---
 
-### **Frontend (GitHub Pages)**
+## 🏗️ Arkitektur
 
-#### **1. Aktivera GitHub Pages**
-
-- G� till GitHub repo ? **Settings** ? **Pages**
-- Source: `main` branch, `/docs` folder
-- Click **Save**
-
-#### **2. Uppdatera config.js med ngrok URL**
-
-**P� din dator:**
-
-1. **�ppna:** `docs/js/config.js`
-
-2. **�ndra:**
-```javascript
-NGROK_API: 'https://ABC123.ngrok-free.app', // DIN NGROK URL!
-MODE: 'ngrok'  // Byt fr�n 'local' till 'ngrok'
-```
-
-3. **Commit och push:**
-```bash
-git add docs/js/config.js
-git commit -m "Update ngrok URL"
-git push
-```
-
-#### **3. V�nta 1-2 minuter**
-
-GitHub Pages deployas automatiskt.
-
-#### **4. �ppna din webbshop!**
-
-```
-https://featuredev.github.io/Node_Android_project/index/index.html
-```
-
-**Nu fungerar det fr�n VILKET WiFi SOM HELST! ??**
+| Komponent | Tjänst | Teknik |
+|---|---|---|
+| **Frontend** | GitHub Pages | HTML, CSS, vanilla JS |
+| **Backend API** | Cloudflare Workers | Hono (TypeScript) |
+| **Databas** | Cloudflare D1 | SQLite |
+| **AI Chatbot** | Cloudflare Workers AI | Llama 3.1 8B |
+| **Domän** | Cloudflare DNS | mogges-store.se |
 
 ---
 
-## **?? Viktigt om Ngrok (Gratis Tier)**
-
-- **URL �ndras** varje g�ng du startar om ngrok
-- **Session timeout** efter ~8 timmar inaktivitet
-- **40 requests/minut** limit p� gratis tier
-- **Statisk URL** kr�ver betald plan ($8/m�nad)
-
-**Varje g�ng ngrok URL �ndras:**
-1. Kopiera ny URL fr�n ngrok terminal
-2. Uppdatera `docs/js/config.js`
-3. Commit & push
-4. V�nta 1-2 min ? GitHub Pages uppdateras
-
----
-
-## **?? Snabb Omstart-Guide**
-
-**N�r ngrok URL har �ndrats:**
-
-```bash
-# 1. Kolla ny ngrok URL (i ngrok terminal)
-# 2. Uppdatera config.js
-sed -i 's|https://.*\.ngrok-free\.app|https://NEW-URL.ngrok-free.app|' docs/js/config.js
-
-# 3. Push
-git add docs/js/config.js
-git commit -m "Update ngrok URL"
-git push
-```
-
----
-
-## ?? K�r Lokalt (Development)
-
-1. **Installera dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Initiera databas:**
-   ```bash
-   npm run init-db
-   ```
-
-3. **Starta server:**
-   ```bash
-   npm start
-   ```
-
-4. **�ppna i browser:**
-   ```
-   http://localhost:3000
-   ```
-
-**Config.js �r inst�lld p�:**
-```javascript
-USE_PHONE: false // Anv�nder localhost
-```
-
----
-
-## ?? Admin Login
-
-**Standard Admin:**
-- Email: `admin@moggesstore.se`
-- Password: `admin123`
-
-**Admin Panel:** `/login.html`
-
----
-
-## ?? Projektstruktur
+## 📁 Projektstruktur
 
 ```
 Node_android_project/
-??? Server.js              # Express backend med API
-??? init-db.js             # Databas setup
-??? package.json
-??? moggesstore.db         # SQLite databas
-??? docs/                  # Frontend (GitHub Pages)
-    ??? index/             # HTML sidor
-    ?   ??? index.html
-    ?   ??? products.html
-    ?   ??? cart.html
-    ?   ??? checkout.html
-    ?   ??? about.html
-    ?   ??? login.html
-    ?   ??? admin.html
-    ??? css/               # Stylesheets
-    ??? js/                # JavaScript
-    ?   ??? config.js      # API configuration
-    ?   ??? products.js
-    ?   ??? cart.js
-    ?   ??? checkout.js
-    ?   ??? login.js
-    ?   ??? admin.js
-    ??? picture/           # Bilder
+├── docs/                    ← Frontend → GitHub Pages (mogges-store.se)
+│   ├── index.html
+│   ├── products.html
+│   ├── cart.html
+│   ├── checkout.html
+│   ├── about.html
+│   ├── login.html
+│   ├── admin.html
+│   ├── css/
+│   │   ├── index.css
+│   │   ├── products.css
+│   │   ├── checkout.css
+│   │   ├── admin.css
+│   │   ├── about.css
+│   │   └── chat.css
+│   ├── js/
+│   │   ├── config.js
+│   │   ├── products.js
+│   │   ├── cart-common.js
+│   │   ├── checkout.js
+│   │   ├── login.js
+│   │   ├── admin.js
+│   │   ├── about.js
+│   │   └── chat.js
+│   └── picture/
+│
+├── mogges-store-api/        ← Backend → Cloudflare Workers (api.mogges-store.se)
+│   ├── src/
+│   │   └── index.ts        # Hela API:n (Hono)
+│   ├── wrangler.jsonc       # Cloudflare Workers config
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── config/                  ← SQL-scheman (referens)
+│   ├── schema.sql
+│   ├── seed-orders.sql
+│   └── seed-users.sql
+│
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ---
 
-## ?? Features
+## ✨ Features
 
-- ? **Produktkatalog** med kategorier
-- ? **Varukorg** med localStorage
-- ? **Checkout** med QR-kod betalning
-- ? **Admin Panel** f�r produkthantering
-- ? **Authentication** med bcrypt + sessions
-- ? **REST API** f�r alla operationer
-- ? **SQLite Databas**
-- ? **Responsive Design**
-- ? **CORS support** f�r cross-origin requests
-
----
-
-## ?? Troubleshooting
-
-**Problem: Produkter laddas inte**
-- Kolla att backend �r ig�ng
-- Verifiera att `config.js` har r�tt IP-adress
-- Kolla Console f�r error-meddelanden
-
-**Problem: CORS errors**
-- Backend m�ste ha CORS aktiverat (redan konfigurerat)
-- Telefon och dator m�ste vara p� samma n�tverk
-
-**Problem: 404 p� GitHub Pages**
-- V�nta 1-2 minuter efter push
-- Kontrollera att Pages �r aktiverat
-- URL ska inneh�lla `/index/index.html`
+- 🛍️ **Produktkatalog** med kategorier, sök och prisfilter
+- 🛒 **Varukorg** med localStorage + serversynk för inloggade
+- 💳 **Checkout** med Swish QR-kod
+- 🤖 **AI Chatbot "Mogge"** — shoppingassistent med produktnavigering
+- 🔐 **JWT-autentisering** med rollsystem (master/admin/employee/user)
+- 👨‍💼 **Admin Panel** — produkter, användare, ordrar
+- 📱 **Responsive Design** för mobil och desktop
+- 🚀 **Serverless** — ingen server att underhålla
 
 ---
 
-## ?? License
+## 🤖 Chatbot "Mogge"
+
+AI-driven shoppingassistent som kan:
+- Svara på frågor om produkter, frakt och returer
+- Navigera till produkter: `"visa skor"`, `"sol"`, `"kappa"`
+- Filtrera på pris: `"under 500"`, `">1000"`, `"500+"`
+- Minns konversationen mellan sidbyten (sessionStorage)
+- Visar snabbknappar: Nyheter, Frakt, Tips, Retur
+
+---
+
+## 🔐 Rollsystem
+
+| Roll | Behörighet |
+|---|---|
+| **master** | Allt + hantera admins |
+| **admin** | Produkter, användare, ordrar |
+| **employee** | Visa ordrar |
+| **user** | Handla, varukorg |
+
+---
+
+## 🚀 Deploy
+
+### Backend (Cloudflare Workers)
+
+```bash
+cd mogges-store-api
+npm install
+npx wrangler deploy
+```
+
+### Frontend (GitHub Pages)
+
+Push till `main` → GitHub Pages deployas automatiskt från `/docs`.
+
+### Databas (Cloudflare D1)
+
+```bash
+# Skapa schema
+npx wrangler d1 execute mogges-store-db --remote --file=../config/schema.sql
+
+# Seed data
+npx wrangler d1 execute mogges-store-db --remote --file=../config/seed-users.sql
+```
+
+---
+
+## 🔧 Lokal Utveckling
+
+```bash
+# Backend
+cd mogges-store-api
+npm install
+npx wrangler dev
+
+# Frontend — öppna docs/ med Live Server (port 5500)
+```
+
+Ändra `docs/js/config.js` till `MODE: 'local'` för lokal utveckling.
+
+---
+
+## 📡 API Endpoints
+
+| Metod | Endpoint | Auth | Beskrivning |
+|---|---|---|---|
+| GET | `/api/products` | — | Alla produkter |
+| POST | `/api/login` | — | Logga in |
+| POST | `/api/register` | — | Registrera konto |
+| GET | `/api/check-auth` | JWT | Kolla inloggning |
+| GET | `/api/cart` | JWT | Hämta varukorg |
+| POST | `/api/cart` | JWT | Uppdatera varukorg |
+| POST | `/api/cart/sync` | JWT | Synka lokal varukorg |
+| DELETE | `/api/cart/:id` | JWT | Ta bort vara |
+| GET | `/api/orders` | employee+ | Alla ordrar |
+| PUT | `/api/orders/:id/status` | admin+ | Ändra orderstatus |
+| POST | `/api/products` | admin+ | Skapa produkt |
+| PUT | `/api/products/:id` | admin+ | Uppdatera produkt |
+| DELETE | `/api/products/:id` | admin+ | Ta bort produkt |
+| GET | `/api/users` | admin+ | Alla användare |
+| POST | `/api/admin/create-user` | admin+ | Skapa användare |
+| PUT | `/api/admin/update-role` | master | Ändra roll |
+| DELETE | `/api/admin/delete-user/:id` | master | Ta bort användare |
+| POST | `/api/chat` | — | AI chatbot |
+
+---
+
+## 📜 License
 
 ISC
 
-## ????? Author
+## 👨‍💻 Author
 
 Mogges Store Development Team
