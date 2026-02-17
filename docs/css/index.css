@@ -390,6 +390,25 @@ body {
     opacity: 0.9;
 }
 
+/* SEO Content Section */
+.seo-section {
+    padding: 3rem 0;
+    background: var(--bg-light, #f8f9fb);
+}
+
+.seo-section h2 {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.seo-section p {
+    color: var(--text-light, #64748b);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    max-width: 800px;
+}
+
 /* Footer */
 footer {
     background: var(--text-dark);
