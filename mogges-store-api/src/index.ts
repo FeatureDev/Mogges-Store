@@ -127,6 +127,60 @@ async function getAuthUser(c: any): Promise<JwtPayload | null> {
 	return await verifyJwt(authHeader.slice(7));
 }
 
+// ==========================================
+// SEO: robots.txt & sitemap.xml (served via Worker to bypass Cloudflare managed robots.txt)
+// ==========================================
+
+app.get('/robots.txt', (c) => {
+	return c.text(`User-agent: *
+Allow: /
+
+Sitemap: https://www.mogges-store.se/sitemap.xml
+`, 200, { 'Content-Type': 'text/plain' });
+});
+
+app.get('/sitemap.xml', (c) => {
+	return c.body(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+	<loc>https://www.mogges-store.se/index.html</loc>
+	<changefreq>weekly</changefreq>
+	<priority>1.0</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/products.html</loc>
+	<changefreq>daily</changefreq>
+	<priority>0.9</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/about.html</loc>
+	<changefreq>monthly</changefreq>
+	<priority>0.6</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/cart.html</loc>
+	<changefreq>weekly</changefreq>
+	<priority>0.5</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/checkout.html</loc>
+	<changefreq>weekly</changefreq>
+	<priority>0.5</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/login.html</loc>
+	<changefreq>monthly</changefreq>
+	<priority>0.4</priority>
+  </url>
+  <url>
+	<loc>https://www.mogges-store.se/register.html</loc>
+	<changefreq>monthly</changefreq>
+	<priority>0.4</priority>
+  </url>
+</urlset>
+`, 200, { 'Content-Type': 'application/xml' });
+});
+
 /**
  * CORS middleware
  * Allows frontend on mogges-store.se to access API

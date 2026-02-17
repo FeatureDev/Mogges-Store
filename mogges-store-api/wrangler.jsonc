@@ -41,6 +41,22 @@
 		{
 			"pattern": "api.mogges-store.se",
 			"custom_domain": true
+		},
+		{
+			"pattern": "www.mogges-store.se/robots.txt",
+			"zone_name": "mogges-store.se"
+		},
+		{
+			"pattern": "www.mogges-store.se/sitemap.xml",
+			"zone_name": "mogges-store.se"
+		},
+		{
+			"pattern": "mogges-store.se/robots.txt",
+			"zone_name": "mogges-store.se"
+		},
+		{
+			"pattern": "mogges-store.se/sitemap.xml",
+			"zone_name": "mogges-store.se"
 		}
 	],
 
